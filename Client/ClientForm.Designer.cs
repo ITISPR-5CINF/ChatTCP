@@ -28,199 +28,186 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.gboxImpostazioni = new System.Windows.Forms.GroupBox();
-            this.cmbNetworkComputers = new System.Windows.Forms.ComboBox();
-            this.txtPortaTcp = new System.Windows.Forms.TextBox();
-            this.lblPortaTcp = new System.Windows.Forms.Label();
-            this.txtIPRemoto = new System.Windows.Forms.TextBox();
-            this.lblIpRemoto = new System.Windows.Forms.Label();
-            this.cmdClose = new System.Windows.Forms.Button();
-            this.cmdConnect = new System.Windows.Forms.Button();
-            this.lstLog = new System.Windows.Forms.ListBox();
-            this.gboxDatiTx = new System.Windows.Forms.GroupBox();
-            this.cmdSend = new System.Windows.Forms.Button();
-            this.txtDatiTx = new System.Windows.Forms.TextBox();
-            this.gboxDatiRx = new System.Windows.Forms.GroupBox();
-            this.txtDatiRx = new System.Windows.Forms.TextBox();
-            this.gboxImpostazioni.SuspendLayout();
-            this.gboxDatiTx.SuspendLayout();
-            this.gboxDatiRx.SuspendLayout();
+            this.ImpostazioniGroupBox = new System.Windows.Forms.GroupBox();
+            this.NetworkComputersComboBox = new System.Windows.Forms.ComboBox();
+            this.PortaTcpTextBox = new System.Windows.Forms.TextBox();
+            this.PortaTcpLabel = new System.Windows.Forms.Label();
+            this.IpRemotoLabel = new System.Windows.Forms.Label();
+            this.CloseButton = new System.Windows.Forms.Button();
+            this.ConnectButton = new System.Windows.Forms.Button();
+            this.LogListBox = new System.Windows.Forms.ListBox();
+            this.DatiTxGroupBox = new System.Windows.Forms.GroupBox();
+            this.SendButton = new System.Windows.Forms.Button();
+            this.DatiTxTextBox = new System.Windows.Forms.TextBox();
+            this.DatiRxGroupBox = new System.Windows.Forms.GroupBox();
+            this.DatiRxTextBox = new System.Windows.Forms.TextBox();
+            this.ImpostazioniGroupBox.SuspendLayout();
+            this.DatiTxGroupBox.SuspendLayout();
+            this.DatiRxGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
-            // gboxImpostazioni
+            // ImpostazioniGroupBox
             // 
-            this.gboxImpostazioni.Controls.Add(this.cmbNetworkComputers);
-            this.gboxImpostazioni.Controls.Add(this.txtPortaTcp);
-            this.gboxImpostazioni.Controls.Add(this.lblPortaTcp);
-            this.gboxImpostazioni.Controls.Add(this.txtIPRemoto);
-            this.gboxImpostazioni.Controls.Add(this.lblIpRemoto);
-            this.gboxImpostazioni.Location = new System.Drawing.Point(12, 2);
-            this.gboxImpostazioni.Name = "gboxImpostazioni";
-            this.gboxImpostazioni.Size = new System.Drawing.Size(161, 111);
-            this.gboxImpostazioni.TabIndex = 1;
-            this.gboxImpostazioni.TabStop = false;
-            this.gboxImpostazioni.Text = "Impostazioni";
+            this.ImpostazioniGroupBox.Controls.Add(this.NetworkComputersComboBox);
+            this.ImpostazioniGroupBox.Controls.Add(this.PortaTcpTextBox);
+            this.ImpostazioniGroupBox.Controls.Add(this.PortaTcpLabel);
+            this.ImpostazioniGroupBox.Controls.Add(this.IpRemotoLabel);
+            this.ImpostazioniGroupBox.Location = new System.Drawing.Point(12, 2);
+            this.ImpostazioniGroupBox.Name = "ImpostazioniGroupBox";
+            this.ImpostazioniGroupBox.Size = new System.Drawing.Size(161, 97);
+            this.ImpostazioniGroupBox.TabIndex = 1;
+            this.ImpostazioniGroupBox.TabStop = false;
+            this.ImpostazioniGroupBox.Text = "Impostazioni";
             // 
-            // cmbNetworkComputers
+            // NetworkComputersComboBox
             // 
-            this.cmbNetworkComputers.FormattingEnabled = true;
-            this.cmbNetworkComputers.Location = new System.Drawing.Point(8, 61);
-            this.cmbNetworkComputers.Name = "cmbNetworkComputers";
-            this.cmbNetworkComputers.Size = new System.Drawing.Size(147, 21);
-            this.cmbNetworkComputers.TabIndex = 4;
-            this.cmbNetworkComputers.SelectedIndexChanged += new System.EventHandler(this.cmbNetworkComputers_SelectedIndexChanged);
+            this.NetworkComputersComboBox.FormattingEnabled = true;
+            this.NetworkComputersComboBox.Location = new System.Drawing.Point(8, 41);
+            this.NetworkComputersComboBox.Name = "NetworkComputersComboBox";
+            this.NetworkComputersComboBox.Size = new System.Drawing.Size(147, 21);
+            this.NetworkComputersComboBox.TabIndex = 4;
             // 
-            // txtPortaTcp
+            // PortaTcpTextBox
             // 
-            this.txtPortaTcp.Location = new System.Drawing.Point(72, 86);
-            this.txtPortaTcp.Name = "txtPortaTcp";
-            this.txtPortaTcp.Size = new System.Drawing.Size(40, 20);
-            this.txtPortaTcp.TabIndex = 3;
-            this.txtPortaTcp.Text = "8221";
+            this.PortaTcpTextBox.Location = new System.Drawing.Point(71, 68);
+            this.PortaTcpTextBox.Name = "PortaTcpTextBox";
+            this.PortaTcpTextBox.Size = new System.Drawing.Size(40, 20);
+            this.PortaTcpTextBox.TabIndex = 3;
+            this.PortaTcpTextBox.Text = "8221";
             // 
-            // lblPortaTcp
+            // PortaTcpLabel
             // 
-            this.lblPortaTcp.Location = new System.Drawing.Point(6, 89);
-            this.lblPortaTcp.Name = "lblPortaTcp";
-            this.lblPortaTcp.Size = new System.Drawing.Size(60, 20);
-            this.lblPortaTcp.TabIndex = 2;
-            this.lblPortaTcp.Text = "Porta TCP:";
+            this.PortaTcpLabel.Location = new System.Drawing.Point(5, 71);
+            this.PortaTcpLabel.Name = "PortaTcpLabel";
+            this.PortaTcpLabel.Size = new System.Drawing.Size(60, 20);
+            this.PortaTcpLabel.TabIndex = 2;
+            this.PortaTcpLabel.Text = "Porta TCP:";
             // 
-            // txtIPRemoto
+            // IpRemotoLabel
             // 
-            this.txtIPRemoto.Location = new System.Drawing.Point(11, 37);
-            this.txtIPRemoto.Name = "txtIPRemoto";
-            this.txtIPRemoto.Size = new System.Drawing.Size(142, 20);
-            this.txtIPRemoto.TabIndex = 1;
-            this.txtIPRemoto.Text = "127.0.0.1";
-            this.txtIPRemoto.Visible = false;
+            this.IpRemotoLabel.Location = new System.Drawing.Point(6, 22);
+            this.IpRemotoLabel.Name = "IpRemotoLabel";
+            this.IpRemotoLabel.Size = new System.Drawing.Size(60, 16);
+            this.IpRemotoLabel.TabIndex = 0;
+            this.IpRemotoLabel.Text = "IP Remoto:";
             // 
-            // lblIpRemoto
+            // CloseButton
             // 
-            this.lblIpRemoto.Location = new System.Drawing.Point(6, 22);
-            this.lblIpRemoto.Name = "lblIpRemoto";
-            this.lblIpRemoto.Size = new System.Drawing.Size(60, 16);
-            this.lblIpRemoto.TabIndex = 0;
-            this.lblIpRemoto.Text = "IP Remoto:";
+            this.CloseButton.Enabled = false;
+            this.CloseButton.Location = new System.Drawing.Point(116, 105);
+            this.CloseButton.Name = "CloseButton";
+            this.CloseButton.Size = new System.Drawing.Size(57, 24);
+            this.CloseButton.TabIndex = 5;
+            this.CloseButton.Text = "Close";
+            this.CloseButton.Click += new System.EventHandler(this.CloseButton_Click);
             // 
-            // cmdClose
+            // ConnectButton
             // 
-            this.cmdClose.Enabled = false;
-            this.cmdClose.Location = new System.Drawing.Point(116, 117);
-            this.cmdClose.Name = "cmdClose";
-            this.cmdClose.Size = new System.Drawing.Size(57, 24);
-            this.cmdClose.TabIndex = 5;
-            this.cmdClose.Text = "Close";
-            this.cmdClose.Click += new System.EventHandler(this.cmdClose_Click);
+            this.ConnectButton.Location = new System.Drawing.Point(12, 105);
+            this.ConnectButton.Name = "ConnectButton";
+            this.ConnectButton.Size = new System.Drawing.Size(57, 24);
+            this.ConnectButton.TabIndex = 4;
+            this.ConnectButton.Text = "Connect";
+            this.ConnectButton.Click += new System.EventHandler(this.ConnectButton_Click);
             // 
-            // cmdConnect
+            // LogListBox
             // 
-            this.cmdConnect.Location = new System.Drawing.Point(12, 117);
-            this.cmdConnect.Name = "cmdConnect";
-            this.cmdConnect.Size = new System.Drawing.Size(57, 24);
-            this.cmdConnect.TabIndex = 4;
-            this.cmdConnect.Text = "Connect";
-            this.cmdConnect.Click += new System.EventHandler(this.cmdConnect_Click);
+            this.LogListBox.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LogListBox.FormattingEnabled = true;
+            this.LogListBox.ItemHeight = 14;
+            this.LogListBox.Location = new System.Drawing.Point(179, 12);
+            this.LogListBox.Name = "LogListBox";
+            this.LogListBox.Size = new System.Drawing.Size(393, 396);
+            this.LogListBox.TabIndex = 7;
             // 
-            // lstLog
+            // DatiTxGroupBox
             // 
-            this.lstLog.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lstLog.FormattingEnabled = true;
-            this.lstLog.ItemHeight = 14;
-            this.lstLog.Location = new System.Drawing.Point(179, 12);
-            this.lstLog.Name = "lstLog";
-            this.lstLog.Size = new System.Drawing.Size(393, 396);
-            this.lstLog.TabIndex = 7;
+            this.DatiTxGroupBox.Controls.Add(this.SendButton);
+            this.DatiTxGroupBox.Controls.Add(this.DatiTxTextBox);
+            this.DatiTxGroupBox.Location = new System.Drawing.Point(12, 135);
+            this.DatiTxGroupBox.Name = "DatiTxGroupBox";
+            this.DatiTxGroupBox.Size = new System.Drawing.Size(161, 152);
+            this.DatiTxGroupBox.TabIndex = 8;
+            this.DatiTxGroupBox.TabStop = false;
+            this.DatiTxGroupBox.Text = "Dati Tx";
             // 
-            // gboxDatiTx
+            // SendButton
             // 
-            this.gboxDatiTx.Controls.Add(this.cmdSend);
-            this.gboxDatiTx.Controls.Add(this.txtDatiTx);
-            this.gboxDatiTx.Location = new System.Drawing.Point(12, 152);
-            this.gboxDatiTx.Name = "gboxDatiTx";
-            this.gboxDatiTx.Size = new System.Drawing.Size(161, 152);
-            this.gboxDatiTx.TabIndex = 8;
-            this.gboxDatiTx.TabStop = false;
-            this.gboxDatiTx.Text = "Dati Tx";
+            this.SendButton.Location = new System.Drawing.Point(16, 120);
+            this.SendButton.Name = "SendButton";
+            this.SendButton.Size = new System.Drawing.Size(50, 24);
+            this.SendButton.TabIndex = 1;
+            this.SendButton.Text = "Send";
+            this.SendButton.Click += new System.EventHandler(this.SendButton_Click);
             // 
-            // cmdSend
+            // DatiTxTextBox
             // 
-            this.cmdSend.Location = new System.Drawing.Point(16, 120);
-            this.cmdSend.Name = "cmdSend";
-            this.cmdSend.Size = new System.Drawing.Size(50, 24);
-            this.cmdSend.TabIndex = 1;
-            this.cmdSend.Text = "Send";
-            this.cmdSend.Click += new System.EventHandler(this.cmdSend_Click);
+            this.DatiTxTextBox.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.DatiTxTextBox.Location = new System.Drawing.Point(8, 16);
+            this.DatiTxTextBox.Multiline = true;
+            this.DatiTxTextBox.Name = "DatiTxTextBox";
+            this.DatiTxTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.DatiTxTextBox.Size = new System.Drawing.Size(144, 96);
+            this.DatiTxTextBox.TabIndex = 0;
             // 
-            // txtDatiTx
+            // DatiRxGroupBox
             // 
-            this.txtDatiTx.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtDatiTx.Location = new System.Drawing.Point(8, 16);
-            this.txtDatiTx.Multiline = true;
-            this.txtDatiTx.Name = "txtDatiTx";
-            this.txtDatiTx.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtDatiTx.Size = new System.Drawing.Size(144, 96);
-            this.txtDatiTx.TabIndex = 0;
+            this.DatiRxGroupBox.Controls.Add(this.DatiRxTextBox);
+            this.DatiRxGroupBox.Location = new System.Drawing.Point(12, 293);
+            this.DatiRxGroupBox.Name = "DatiRxGroupBox";
+            this.DatiRxGroupBox.Size = new System.Drawing.Size(161, 119);
+            this.DatiRxGroupBox.TabIndex = 9;
+            this.DatiRxGroupBox.TabStop = false;
+            this.DatiRxGroupBox.Text = "Dati Rx";
             // 
-            // gboxDatiRx
+            // DatiRxTextBox
             // 
-            this.gboxDatiRx.Controls.Add(this.txtDatiRx);
-            this.gboxDatiRx.Location = new System.Drawing.Point(12, 310);
-            this.gboxDatiRx.Name = "gboxDatiRx";
-            this.gboxDatiRx.Size = new System.Drawing.Size(161, 102);
-            this.gboxDatiRx.TabIndex = 9;
-            this.gboxDatiRx.TabStop = false;
-            this.gboxDatiRx.Text = "Dati Rx";
+            this.DatiRxTextBox.Location = new System.Drawing.Point(8, 19);
+            this.DatiRxTextBox.Multiline = true;
+            this.DatiRxTextBox.Name = "DatiRxTextBox";
+            this.DatiRxTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.DatiRxTextBox.Size = new System.Drawing.Size(144, 94);
+            this.DatiRxTextBox.TabIndex = 2;
             // 
-            // txtDatiRx
-            // 
-            this.txtDatiRx.Location = new System.Drawing.Point(8, 19);
-            this.txtDatiRx.Multiline = true;
-            this.txtDatiRx.Name = "txtDatiRx";
-            this.txtDatiRx.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtDatiRx.Size = new System.Drawing.Size(144, 70);
-            this.txtDatiRx.TabIndex = 2;
-            // 
-            // frmClient
+            // ClientForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(583, 423);
-            this.Controls.Add(this.gboxDatiRx);
-            this.Controls.Add(this.gboxDatiTx);
-            this.Controls.Add(this.lstLog);
-            this.Controls.Add(this.cmdConnect);
-            this.Controls.Add(this.cmdClose);
-            this.Controls.Add(this.gboxImpostazioni);
-            this.Name = "frmClient";
+            this.Controls.Add(this.DatiRxGroupBox);
+            this.Controls.Add(this.DatiTxGroupBox);
+            this.Controls.Add(this.LogListBox);
+            this.Controls.Add(this.ConnectButton);
+            this.Controls.Add(this.CloseButton);
+            this.Controls.Add(this.ImpostazioniGroupBox);
+            this.Name = "ClientForm";
             this.Text = "frmClient";
-            this.Load += new System.EventHandler(this.frmClient_Load);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmClient_FormClosing);
-            this.gboxImpostazioni.ResumeLayout(false);
-            this.gboxImpostazioni.PerformLayout();
-            this.gboxDatiTx.ResumeLayout(false);
-            this.gboxDatiTx.PerformLayout();
-            this.gboxDatiRx.ResumeLayout(false);
-            this.gboxDatiRx.PerformLayout();
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ClientForm_FormClosing);
+            this.Load += new System.EventHandler(this.ClientForm_Load);
+            this.ImpostazioniGroupBox.ResumeLayout(false);
+            this.ImpostazioniGroupBox.PerformLayout();
+            this.DatiTxGroupBox.ResumeLayout(false);
+            this.DatiTxGroupBox.PerformLayout();
+            this.DatiRxGroupBox.ResumeLayout(false);
+            this.DatiRxGroupBox.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.GroupBox gboxImpostazioni;
-        private System.Windows.Forms.Button cmdClose;
-        private System.Windows.Forms.Button cmdConnect;
-        private System.Windows.Forms.TextBox txtPortaTcp;
-        private System.Windows.Forms.Label lblPortaTcp;
-        private System.Windows.Forms.TextBox txtIPRemoto;
-        private System.Windows.Forms.Label lblIpRemoto;
-        private System.Windows.Forms.ListBox lstLog;
-        private System.Windows.Forms.GroupBox gboxDatiTx;
-        private System.Windows.Forms.Button cmdSend;
-        private System.Windows.Forms.TextBox txtDatiTx;
-        private System.Windows.Forms.GroupBox gboxDatiRx;
-        private System.Windows.Forms.TextBox txtDatiRx;
-        private System.Windows.Forms.ComboBox cmbNetworkComputers;
+        private System.Windows.Forms.GroupBox ImpostazioniGroupBox;
+        private System.Windows.Forms.Button CloseButton;
+        private System.Windows.Forms.Button ConnectButton;
+        private System.Windows.Forms.TextBox PortaTcpTextBox;
+        private System.Windows.Forms.Label PortaTcpLabel;
+        private System.Windows.Forms.Label IpRemotoLabel;
+        private System.Windows.Forms.ListBox LogListBox;
+        private System.Windows.Forms.GroupBox DatiTxGroupBox;
+        private System.Windows.Forms.Button SendButton;
+        private System.Windows.Forms.TextBox DatiTxTextBox;
+        private System.Windows.Forms.GroupBox DatiRxGroupBox;
+        private System.Windows.Forms.TextBox DatiRxTextBox;
+        private System.Windows.Forms.ComboBox NetworkComputersComboBox;
     }
 }
