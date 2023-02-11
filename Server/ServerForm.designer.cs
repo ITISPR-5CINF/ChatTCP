@@ -28,175 +28,175 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.gboxSettings = new System.Windows.Forms.GroupBox();
-            this.txtPortaTcp = new System.Windows.Forms.TextBox();
-            this.lblPortaTcp = new System.Windows.Forms.Label();
-            this.cmdStopListening = new System.Windows.Forms.Button();
-            this.cmdListen = new System.Windows.Forms.Button();
-            this.gboxDatiTx = new System.Windows.Forms.GroupBox();
-            this.cmdSend = new System.Windows.Forms.Button();
-            this.txtDatiTx = new System.Windows.Forms.TextBox();
-            this.cmdDisconnect = new System.Windows.Forms.Button();
-            this.gboxDatiRx = new System.Windows.Forms.GroupBox();
-            this.txtDatiRx = new System.Windows.Forms.TextBox();
-            this.lstLog = new System.Windows.Forms.ListBox();
-            this.gboxSettings.SuspendLayout();
-            this.gboxDatiTx.SuspendLayout();
-            this.gboxDatiRx.SuspendLayout();
+            this.SettingsGroupBox = new System.Windows.Forms.GroupBox();
+            this.PortaTcpTextBox = new System.Windows.Forms.TextBox();
+            this.PortaTcpLabel = new System.Windows.Forms.Label();
+            this.StopListeningButton = new System.Windows.Forms.Button();
+            this.StartListeningButton = new System.Windows.Forms.Button();
+            this.DatiTxGroupBox = new System.Windows.Forms.GroupBox();
+            this.SendButton = new System.Windows.Forms.Button();
+            this.DatiTxTextBox = new System.Windows.Forms.TextBox();
+            this.DisconnectButton = new System.Windows.Forms.Button();
+            this.DatiRxGroupBox = new System.Windows.Forms.GroupBox();
+            this.DatiRxTextBox = new System.Windows.Forms.TextBox();
+            this.LogListBox = new System.Windows.Forms.ListBox();
+            this.SettingsGroupBox.SuspendLayout();
+            this.DatiTxGroupBox.SuspendLayout();
+            this.DatiRxGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
-            // gboxSettings
+            // SettingsGroupBox
             // 
-            this.gboxSettings.Controls.Add(this.txtPortaTcp);
-            this.gboxSettings.Controls.Add(this.lblPortaTcp);
-            this.gboxSettings.Location = new System.Drawing.Point(12, 12);
-            this.gboxSettings.Name = "gboxSettings";
-            this.gboxSettings.Size = new System.Drawing.Size(162, 54);
-            this.gboxSettings.TabIndex = 1;
-            this.gboxSettings.TabStop = false;
-            this.gboxSettings.Text = "Impostazioni";
+            this.SettingsGroupBox.Controls.Add(this.PortaTcpTextBox);
+            this.SettingsGroupBox.Controls.Add(this.PortaTcpLabel);
+            this.SettingsGroupBox.Location = new System.Drawing.Point(12, 12);
+            this.SettingsGroupBox.Name = "SettingsGroupBox";
+            this.SettingsGroupBox.Size = new System.Drawing.Size(162, 54);
+            this.SettingsGroupBox.TabIndex = 1;
+            this.SettingsGroupBox.TabStop = false;
+            this.SettingsGroupBox.Text = "Impostazioni";
             // 
-            // txtPortaTcp
+            // PortaTcpTextBox
             // 
-            this.txtPortaTcp.Location = new System.Drawing.Point(110, 16);
-            this.txtPortaTcp.Name = "txtPortaTcp";
-            this.txtPortaTcp.Size = new System.Drawing.Size(40, 20);
-            this.txtPortaTcp.TabIndex = 1;
+            this.PortaTcpTextBox.Location = new System.Drawing.Point(110, 16);
+            this.PortaTcpTextBox.Name = "PortaTcpTextBox";
+            this.PortaTcpTextBox.Size = new System.Drawing.Size(40, 20);
+            this.PortaTcpTextBox.TabIndex = 1;
             // 
-            // lblPortaTcp
+            // PortaTcpLabel
             // 
-            this.lblPortaTcp.Location = new System.Drawing.Point(13, 20);
-            this.lblPortaTcp.Name = "lblPortaTcp";
-            this.lblPortaTcp.Size = new System.Drawing.Size(72, 16);
-            this.lblPortaTcp.TabIndex = 0;
-            this.lblPortaTcp.Text = "Porta TCP:";
+            this.PortaTcpLabel.Location = new System.Drawing.Point(13, 20);
+            this.PortaTcpLabel.Name = "PortaTcpLabel";
+            this.PortaTcpLabel.Size = new System.Drawing.Size(72, 16);
+            this.PortaTcpLabel.TabIndex = 0;
+            this.PortaTcpLabel.Text = "Porta TCP:";
             // 
-            // cmdStopListening
+            // StopListeningButton
             // 
-            this.cmdStopListening.Location = new System.Drawing.Point(103, 72);
-            this.cmdStopListening.Name = "cmdStopListening";
-            this.cmdStopListening.Size = new System.Drawing.Size(82, 24);
-            this.cmdStopListening.TabIndex = 3;
-            this.cmdStopListening.Text = "Stop Listening";
-            this.cmdStopListening.Click += new System.EventHandler(this.cmdStopListening_Click);
+            this.StopListeningButton.Location = new System.Drawing.Point(103, 72);
+            this.StopListeningButton.Name = "StopListeningButton";
+            this.StopListeningButton.Size = new System.Drawing.Size(82, 24);
+            this.StopListeningButton.TabIndex = 3;
+            this.StopListeningButton.Text = "Stop Listening";
+            this.StopListeningButton.Click += new System.EventHandler(this.StopListeningButton_Click);
             // 
-            // cmdListen
+            // StartListeningButton
             // 
-            this.cmdListen.Location = new System.Drawing.Point(12, 72);
-            this.cmdListen.Name = "cmdListen";
-            this.cmdListen.Size = new System.Drawing.Size(85, 24);
-            this.cmdListen.TabIndex = 2;
-            this.cmdListen.Text = "Start Listening";
-            this.cmdListen.Click += new System.EventHandler(this.cmdListen_Click);
+            this.StartListeningButton.Location = new System.Drawing.Point(12, 72);
+            this.StartListeningButton.Name = "StartListeningButton";
+            this.StartListeningButton.Size = new System.Drawing.Size(85, 24);
+            this.StartListeningButton.TabIndex = 2;
+            this.StartListeningButton.Text = "Start Listening";
+            this.StartListeningButton.Click += new System.EventHandler(this.StartListeningButton_Click);
             // 
-            // gboxDatiTx
+            // DatiTxGroupBox
             // 
-            this.gboxDatiTx.Controls.Add(this.cmdSend);
-            this.gboxDatiTx.Controls.Add(this.txtDatiTx);
-            this.gboxDatiTx.Location = new System.Drawing.Point(12, 120);
-            this.gboxDatiTx.Name = "gboxDatiTx";
-            this.gboxDatiTx.Size = new System.Drawing.Size(162, 152);
-            this.gboxDatiTx.TabIndex = 4;
-            this.gboxDatiTx.TabStop = false;
-            this.gboxDatiTx.Text = "Dati Tx";
+            this.DatiTxGroupBox.Controls.Add(this.SendButton);
+            this.DatiTxGroupBox.Controls.Add(this.DatiTxTextBox);
+            this.DatiTxGroupBox.Location = new System.Drawing.Point(12, 120);
+            this.DatiTxGroupBox.Name = "DatiTxGroupBox";
+            this.DatiTxGroupBox.Size = new System.Drawing.Size(162, 152);
+            this.DatiTxGroupBox.TabIndex = 4;
+            this.DatiTxGroupBox.TabStop = false;
+            this.DatiTxGroupBox.Text = "Dati Tx";
             // 
-            // cmdSend
+            // SendButton
             // 
-            this.cmdSend.Location = new System.Drawing.Point(16, 120);
-            this.cmdSend.Name = "cmdSend";
-            this.cmdSend.Size = new System.Drawing.Size(48, 24);
-            this.cmdSend.TabIndex = 1;
-            this.cmdSend.Text = "Send";
-            this.cmdSend.Click += new System.EventHandler(this.cmdSend_Click);
+            this.SendButton.Location = new System.Drawing.Point(16, 120);
+            this.SendButton.Name = "SendButton";
+            this.SendButton.Size = new System.Drawing.Size(48, 24);
+            this.SendButton.TabIndex = 1;
+            this.SendButton.Text = "Send";
+            this.SendButton.Click += new System.EventHandler(this.SendButton_Click);
             // 
-            // txtDatiTx
+            // DatiTxTextBox
             // 
-            this.txtDatiTx.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtDatiTx.Location = new System.Drawing.Point(8, 16);
-            this.txtDatiTx.Multiline = true;
-            this.txtDatiTx.Name = "txtDatiTx";
-            this.txtDatiTx.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtDatiTx.Size = new System.Drawing.Size(142, 96);
-            this.txtDatiTx.TabIndex = 0;
+            this.DatiTxTextBox.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.DatiTxTextBox.Location = new System.Drawing.Point(8, 16);
+            this.DatiTxTextBox.Multiline = true;
+            this.DatiTxTextBox.Name = "DatiTxTextBox";
+            this.DatiTxTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.DatiTxTextBox.Size = new System.Drawing.Size(142, 96);
+            this.DatiTxTextBox.TabIndex = 0;
             // 
-            // cmdDisconnect
+            // DisconnectButton
             // 
-            this.cmdDisconnect.Location = new System.Drawing.Point(15, 386);
-            this.cmdDisconnect.Name = "cmdDisconnect";
-            this.cmdDisconnect.Size = new System.Drawing.Size(82, 24);
-            this.cmdDisconnect.TabIndex = 2;
-            this.cmdDisconnect.Text = "Disconnect";
-            this.cmdDisconnect.Click += new System.EventHandler(this.cmdDisconnect_Click);
+            this.DisconnectButton.Location = new System.Drawing.Point(15, 386);
+            this.DisconnectButton.Name = "DisconnectButton";
+            this.DisconnectButton.Size = new System.Drawing.Size(82, 24);
+            this.DisconnectButton.TabIndex = 2;
+            this.DisconnectButton.Text = "Disconnect";
+            this.DisconnectButton.Click += new System.EventHandler(this.DisconnectButton_Click);
             // 
-            // gboxDatiRx
+            // DatiRxGroupBox
             // 
-            this.gboxDatiRx.Controls.Add(this.txtDatiRx);
-            this.gboxDatiRx.Location = new System.Drawing.Point(12, 278);
-            this.gboxDatiRx.Name = "gboxDatiRx";
-            this.gboxDatiRx.Size = new System.Drawing.Size(162, 102);
-            this.gboxDatiRx.TabIndex = 5;
-            this.gboxDatiRx.TabStop = false;
-            this.gboxDatiRx.Text = "Dati Rx";
+            this.DatiRxGroupBox.Controls.Add(this.DatiRxTextBox);
+            this.DatiRxGroupBox.Location = new System.Drawing.Point(12, 278);
+            this.DatiRxGroupBox.Name = "DatiRxGroupBox";
+            this.DatiRxGroupBox.Size = new System.Drawing.Size(162, 102);
+            this.DatiRxGroupBox.TabIndex = 5;
+            this.DatiRxGroupBox.TabStop = false;
+            this.DatiRxGroupBox.Text = "Dati Rx";
             // 
-            // txtDatiRx
+            // DatiRxTextBox
             // 
-            this.txtDatiRx.Location = new System.Drawing.Point(6, 19);
-            this.txtDatiRx.Multiline = true;
-            this.txtDatiRx.Name = "txtDatiRx";
-            this.txtDatiRx.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtDatiRx.Size = new System.Drawing.Size(144, 70);
-            this.txtDatiRx.TabIndex = 2;
+            this.DatiRxTextBox.Location = new System.Drawing.Point(6, 19);
+            this.DatiRxTextBox.Multiline = true;
+            this.DatiRxTextBox.Name = "DatiRxTextBox";
+            this.DatiRxTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.DatiRxTextBox.Size = new System.Drawing.Size(144, 70);
+            this.DatiRxTextBox.TabIndex = 2;
             // 
-            // lstLog
+            // LogListBox
             // 
-            this.lstLog.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lstLog.FormattingEnabled = true;
-            this.lstLog.ItemHeight = 14;
-            this.lstLog.Location = new System.Drawing.Point(191, 12);
-            this.lstLog.Name = "lstLog";
-            this.lstLog.Size = new System.Drawing.Size(388, 396);
-            this.lstLog.TabIndex = 6;
+            this.LogListBox.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LogListBox.FormattingEnabled = true;
+            this.LogListBox.ItemHeight = 14;
+            this.LogListBox.Location = new System.Drawing.Point(191, 12);
+            this.LogListBox.Name = "LogListBox";
+            this.LogListBox.Size = new System.Drawing.Size(388, 396);
+            this.LogListBox.TabIndex = 6;
             // 
-            // frmServer
+            // ServerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(591, 422);
-            this.Controls.Add(this.lstLog);
-            this.Controls.Add(this.gboxDatiRx);
-            this.Controls.Add(this.cmdDisconnect);
-            this.Controls.Add(this.gboxDatiTx);
-            this.Controls.Add(this.cmdStopListening);
-            this.Controls.Add(this.gboxSettings);
-            this.Controls.Add(this.cmdListen);
-            this.Name = "frmServer";
+            this.Controls.Add(this.LogListBox);
+            this.Controls.Add(this.DatiRxGroupBox);
+            this.Controls.Add(this.DisconnectButton);
+            this.Controls.Add(this.DatiTxGroupBox);
+            this.Controls.Add(this.StopListeningButton);
+            this.Controls.Add(this.SettingsGroupBox);
+            this.Controls.Add(this.StartListeningButton);
+            this.Name = "ServerForm";
             this.Text = "Server";
-            this.Load += new System.EventHandler(this.frmServer_Load);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmServer_FormClosing);
-            this.gboxSettings.ResumeLayout(false);
-            this.gboxSettings.PerformLayout();
-            this.gboxDatiTx.ResumeLayout(false);
-            this.gboxDatiTx.PerformLayout();
-            this.gboxDatiRx.ResumeLayout(false);
-            this.gboxDatiRx.PerformLayout();
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ServerForm_FormClosing);
+            this.Load += new System.EventHandler(this.ServerForm_Load);
+            this.SettingsGroupBox.ResumeLayout(false);
+            this.SettingsGroupBox.PerformLayout();
+            this.DatiTxGroupBox.ResumeLayout(false);
+            this.DatiTxGroupBox.PerformLayout();
+            this.DatiRxGroupBox.ResumeLayout(false);
+            this.DatiRxGroupBox.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.GroupBox gboxSettings;
-        private System.Windows.Forms.TextBox txtPortaTcp;
-        private System.Windows.Forms.Label lblPortaTcp;
-        private System.Windows.Forms.Button cmdStopListening;
-        private System.Windows.Forms.Button cmdListen;
-        private System.Windows.Forms.GroupBox gboxDatiTx;
-        private System.Windows.Forms.Button cmdSend;
-        private System.Windows.Forms.TextBox txtDatiTx;
-        private System.Windows.Forms.Button cmdDisconnect;
-        private System.Windows.Forms.GroupBox gboxDatiRx;
-        private System.Windows.Forms.TextBox txtDatiRx;
-        private System.Windows.Forms.ListBox lstLog;
+        private System.Windows.Forms.GroupBox SettingsGroupBox;
+        private System.Windows.Forms.TextBox PortaTcpTextBox;
+        private System.Windows.Forms.Label PortaTcpLabel;
+        private System.Windows.Forms.Button StopListeningButton;
+        private System.Windows.Forms.Button StartListeningButton;
+        private System.Windows.Forms.GroupBox DatiTxGroupBox;
+        private System.Windows.Forms.Button SendButton;
+        private System.Windows.Forms.TextBox DatiTxTextBox;
+        private System.Windows.Forms.Button DisconnectButton;
+        private System.Windows.Forms.GroupBox DatiRxGroupBox;
+        private System.Windows.Forms.TextBox DatiRxTextBox;
+        private System.Windows.Forms.ListBox LogListBox;
 
     
     

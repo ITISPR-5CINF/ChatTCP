@@ -1,72 +1,54 @@
 ﻿using System;
+using System.Net;
+using System.Net.Sockets;
 using System.Windows.Forms;
-using System.Net; // per il tipo IPEndPoint
-using System.Net.Sockets;  // per il tipo Socket
 
 namespace ChatTCP.Server
 {
     public partial class ServerForm : Form
     {
-
-
         private const string WINDOWTITLE = "Socket Server in C#";
-        private const string WINDOWTITLECLIENT = "Socket Client in C#";
 
-        enum Status
+        private enum Stato
         {
             Iniziale,
             Listening,
             Connesso
         }
+        private Stato _stato;
 
-        Status Stato;
+        private const int DEFAULT_PORT = 8221;
 
         private const int DIMBUFF = 5;
-        private const int PORTLISTEN = 8221;
-        byte[] abytRx = new byte[DIMBUFF];
-        public Socket m_socListener;
-        public Socket m_socWorker;
 
+        private readonly byte[] receivedBytesBuffer = new byte[DIMBUFF];
 
-
-
-
+        public Socket _receiveSocket;
+        public Socket _sendSocket;
 
         public ServerForm()
         {
             InitializeComponent();
-
         }
 
-
-
-
-        #region F O R M
-
-        private void frmServer_Load(object sender, EventArgs e)
+        private void ServerForm_Load(object sender, EventArgs e)
         {
-            IntPtr h;
+            // Imposta il titolo della finestra
+            Text = WINDOWTITLE;
 
-            this.Text = WINDOWTITLE;
+            // Imposta porta di default
+            PortaTcpTextBox.Text = Convert.ToString(DEFAULT_PORT);
 
-
-
-            txtPortaTcp.Text = Convert.ToString(PORTLISTEN);
-
-            Stato = Status.Iniziale;
-            layout();
-
-
-
-
+            // Imposta lo stato iniziale
+            _stato = Stato.Iniziale;
+            UpdateLayout();
         }
 
-
-        private void frmServer_FormClosing(object sender, FormClosingEventArgs e)
+        private void ServerForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (m_socWorker != null)
+            if (_sendSocket != null)
             {
-                if (m_socWorker.Connected)
+                if (_sendSocket.Connected)
                 {
                     MessageBox.Show("Connessione aperta", "Client");
                     e.Cancel = true;
@@ -74,97 +56,79 @@ namespace ChatTCP.Server
                 }
             }
 
-
             try
             {
-                if (m_socListener != null)
+                if (_receiveSocket != null)
                 {
-                    ServerMain.Log(lstLog, "CALL: Close(); socket Listener");
-                    m_socListener.Close();
-                    m_socListener = null;
+                    Log("CALL: Close(); socket Listener");
+                    _receiveSocket.Close();
+                    _receiveSocket = null;
                 }
             }
             catch (SocketException se)
             {
                 MessageBox.Show(se.Message, "Server");
             }
-
         }
 
-        #endregion
-
-
-
-
-
-        #region P U L S A N T I
-
-        private void cmdListen_Click(object sender, EventArgs e)
+        private void StartListeningButton_Click(object sender, EventArgs e)
         {
-            string strTcp;
-            int PortaTcp;
-            bool blnOk;
-
-            strTcp = txtPortaTcp.Text;
-            blnOk = int.TryParse(strTcp, out PortaTcp);
-
-            if (blnOk && PortaTcp > 1024)
+            string portString = PortaTcpTextBox.Text;
+            if (!int.TryParse(portString, out int port))
             {
-                try
-                {
-                    //Creazione del socket in attesa sulla porta nota
-                    ServerMain.Log(lstLog, "-------------------------");
-
-                    m_socListener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-                    //Associazione dell'endpoint (indirizzo IP locale/porta TCP) al socket
-                    IPEndPoint ipLocal = new IPEndPoint(IPAddress.Any, PortaTcp);
-                    m_socListener.Bind(ipLocal);
-                    ServerMain.Log(lstLog, "CALL: Bind(); Socket creato e associato (" + IPAddress.Any.ToString() + ":" + strTcp + ")");
-
-                    //Avvio Listening sulla porta TCP nota
-                    m_socListener.Listen(4);
-                    ServerMain.Log(lstLog, "CALL: Listen(); Socket in listening");
-
-                    // Creazione funzione di callback per accettare connessioni
-                    m_socListener.BeginAccept(new AsyncCallback(OnAccept), null);
-                    ServerMain.Log(lstLog, "CALL: BeginAccept(); Callback BeginAccept impostata");
-
-                    Stato = Status.Listening;
-                    layout();
-
-
-
-                }
-                catch (SocketException se)
-                {
-                    MessageBox.Show(se.Message, "Server");
-                }
-
-            }
-            else
-            {
-                MessageBox.Show("Numero di porta [" + txtPortaTcp.Text + "] non valido", WINDOWTITLE);
+                MessageBox.Show($"La porta {portString} non è valido");
+                return;
             }
 
-        }
-
-
-
-        private void cmdStopListening_Click(object sender, EventArgs e)
-        {
-
+            if (port <= 1024)
+            {
+                MessageBox.Show($"La porta {port} non deve essere inferiore o uguale a 1024 (non usare porte standard)");
+                return;
+            }
 
             try
             {
-                if (m_socListener != null)
-                {
-                    ServerMain.Log(lstLog, "CALL: Close(); socket Listener");
-                    m_socListener.Close();
-                    m_socListener = null;
+                // Creazione del socket in attesa sulla porta nota
+                Log("-------------------------");
 
-                    Stato = Status.Iniziale;
-                    layout();
+                // Crea socket di ricezione
+                _receiveSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+                // Associazione dell'endpoint (indirizzo IP locale/porta TCP) al socket
+                IPEndPoint ipLocal = new IPEndPoint(IPAddress.Any, port);
+                _receiveSocket.Bind(ipLocal);
+                Log($"CALL: Bind(); Socket creato e associato ({IPAddress.Any}:{portString})");
+
+                // Avvio listening sulla porta TCP nota
+                _receiveSocket.Listen(4);
+                Log("CALL: Listen(); Socket in listening");
+
+                // Creazione funzione di callback per accettare connessioni
+                _receiveSocket.BeginAccept(new AsyncCallback(OnAccept), null);
+                Log("CALL: BeginAccept(); Callback BeginAccept impostata");
+
+                // Aggiorna lo stato e la UI
+                _stato = Stato.Listening;
+                UpdateLayout();
+            }
+            catch (SocketException se)
+            {
+                MessageBox.Show(se.Message, "Server");
+            }
+        }
+
+        private void StopListeningButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_receiveSocket != null)
+                {
+                    Log("CALL: Close(); socket Listener");
+                    _receiveSocket.Close();
+                    _receiveSocket = null;
+
+                    _stato = Stato.Iniziale;
+                    UpdateLayout();
                 }
                 else
                 {
@@ -175,255 +139,212 @@ namespace ChatTCP.Server
             {
                 MessageBox.Show(se.Message, "Server");
             }
-
-
-
         }
 
-
-        private void cmdSend_Click(object sender, EventArgs e)
+        private void SendButton_Click(object sender, EventArgs e)
         {
             try
             {
-                Object objData = txtDatiTx.Text;
-                byte[] byData = System.Text.Encoding.ASCII.GetBytes(objData.ToString());
+                string message = DatiTxTextBox.Text;
+                byte[] messageBytes = System.Text.Encoding.ASCII.GetBytes(message);
+                
+                if (_sendSocket == null)
+                {
+                    MessageBox.Show("Socket di invio nullo", "Server");
+                    return;
+                }
 
-                if (m_socWorker != null)
+                if (!_sendSocket.Connected)
                 {
-                    if (m_socWorker.Connected)
-                    {
-                        ServerMain.Log(lstLog, "CALL: Send();");
-                        m_socWorker.Send(byData);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Client non connesso", "Server");
-                    }
+                    MessageBox.Show("Client non connesso", "Server");
+                    return;
                 }
-                else
-                {
-                    MessageBox.Show("Client nullo", "Server");
-                }
+
+                Log("CALL: Send();");
+                _sendSocket.Send(messageBytes);
             }
             catch (SocketException se)
             {
                 MessageBox.Show(se.Message, "Server");
             }
-
         }
 
-
-        private void cmdDisconnect_Click(object sender, EventArgs e)
+        private void DisconnectButton_Click(object sender, EventArgs e)
         {
-            if (m_socWorker != null)
+            if (_sendSocket == null)
             {
-                if (m_socWorker.Connected)
-                {
-                    ServerMain.Log(lstLog, "CALL: BeginDisconnect(); Richiesta disconnessione");
-                    m_socWorker.BeginDisconnect(false, new AsyncCallback(OnDisconnect), m_socWorker);
-                }
-                else
-                {
-                    MessageBox.Show("Client non connesso", "Server");
-                }
-            }
-            else
-            {
-                MessageBox.Show("Client nullo", "Server");
+                MessageBox.Show("Socket di invio nullo", "Server");
+                return;
             }
 
+            if (!_sendSocket.Connected)
+            {
+                MessageBox.Show("Client non connesso", "Server");
+                return;
+            }
+
+            Log("CALL: BeginDisconnect(); Richiesta disconnessione");
+            _sendSocket.BeginDisconnect(false, new AsyncCallback(OnDisconnect), _sendSocket);
         }
-
-
-
-        #endregion
-
-
-
-
-
-        #region E V E N T I
 
         private delegate void del_OnAccept(IAsyncResult asyn);
         public void OnAccept(IAsyncResult asyn)
         {
+            // Fa in modo che questa funzione venga eseguita nel thread corretto
             if (InvokeRequired)
             {
                 BeginInvoke(new del_OnAccept(OnAccept), asyn);
                 return;
             }
 
-            if (m_socListener != null)
+            if (_receiveSocket == null)
             {
-                try
-                {
-                    m_socWorker = m_socListener.EndAccept(asyn);
-                    ServerMain.Log(lstLog, "EVNT: BeginAccept(); Connessione accettata");
-
-                    ServerMain.Log(lstLog, "CALL: BeginReceive(); Pronto a ricevere");
-                    m_socWorker.BeginReceive(abytRx, 0, abytRx.Length, SocketFlags.None, new AsyncCallback(OnDataReceived), m_socWorker);
-
-                    Stato = Status.Connesso;
-                    layout();
-
-                    ServerMain.Log(lstLog, ".........................");
-                    ServerMain.Log(lstLog, "CALL: BeginAccept(); BeginAccept REimpostata");
-                    m_socListener.BeginAccept(new AsyncCallback(OnAccept), null);
-
-                }
-                catch (ObjectDisposedException)
-                {
-                    ServerMain.Log(lstLog, "EVNT: BeginAccept(); Errore: ObjectDisposedException");
-                    MessageBox.Show("ObjectDisposedException", "Server");
-                }
-                catch (SocketException se)
-                {
-                    ServerMain.Log(lstLog, "EVNT: BeginAccept(); Errore: " + se.Message);
-                    MessageBox.Show(se.Message, "Server");
-                }
-
-            }
-            else
-            {
-                ServerMain.Log(lstLog, "EVNT: BeginAccept(); Listener nullo");
+                Log("EVNT: BeginAccept(); Listener nullo");
+                return;
             }
 
+            try
+            {
+                _sendSocket = _receiveSocket.EndAccept(asyn);
+                Log("EVNT: BeginAccept(); Connessione accettata");
 
+                Log("CALL: BeginReceive(); Pronto a ricevere");
+                _sendSocket.BeginReceive(receivedBytesBuffer, 0, receivedBytesBuffer.Length, SocketFlags.None, new AsyncCallback(OnDataReceived), _sendSocket);
+
+                // Aggiorna lo stato e la UI
+                _stato = Stato.Connesso;
+                UpdateLayout();
+
+                Log(".........................");
+                Log("CALL: BeginAccept(); BeginAccept REimpostata");
+                _receiveSocket.BeginAccept(new AsyncCallback(OnAccept), null);
+            }
+            catch (ObjectDisposedException)
+            {
+                Log("EVNT: BeginAccept(); Errore: ObjectDisposedException");
+                MessageBox.Show("ObjectDisposedException", "Server");
+            }
+            catch (SocketException se)
+            {
+                Log("EVNT: BeginAccept(); Errore: " + se.Message);
+                MessageBox.Show(se.Message, "Server");
+            }
         }
-
-
-
 
         private delegate void del_OnDataReceived(IAsyncResult asyn);
         public void OnDataReceived(IAsyncResult asyn)
         {
+            // Fa in modo che questa funzione venga eseguita nel thread corretto
             if (InvokeRequired)
             {
                 BeginInvoke(new del_OnDataReceived(OnDataReceived), asyn);
                 return;
             }
 
-
             try
             {
-                if (m_socWorker.Connected)
+                if (!_sendSocket.Connected)
                 {
-                    int iRx = 0;
-                    bool blnRemoteSocketClosing;
+                    Log("EVNT: OnDataReceived(); Disconnesso dal Server");
 
-                    // Quanti ricevuti
-                    iRx = m_socWorker.EndReceive(asyn);  //iRx = ((Socket)(asyn.AsyncState)).EndReceive(asyn);
-                    blnRemoteSocketClosing = m_socWorker.Poll(1, SelectMode.SelectRead);
+                    // Aggiorna lo stato e la UI
+                    _stato = Stato.Listening;
+                    UpdateLayout();
 
-                    if ((!blnRemoteSocketClosing) || (iRx != 0))
-                    {
-                        ServerMain.Log(lstLog, "EVNT: OnDataReceived();");
-                        String szData = System.Text.ASCIIEncoding.ASCII.GetString(abytRx, 0, iRx);
-                        txtDatiRx.Text = txtDatiRx.Text + szData;
-                        ServerMain.Log(lstLog, "CALL: BeginReceive(); Pronto a ricevere");
-                        m_socWorker.BeginReceive(abytRx, 0, abytRx.Length, SocketFlags.None, new AsyncCallback(OnDataReceived), m_socWorker);
-                    }
-                    else
-                    {
-                        ServerMain.Log(lstLog, "EVNT: OnDataReceived(); Disconnesso dal Client");
-                        ServerMain.Log(lstLog, "CALL: Close();");
-                        m_socWorker.Close();
-                        m_socWorker = null;
-
-                        Stato = Status.Listening;
-                        layout();
-                    }
+                    return;
                 }
-                else
+
+                int numReceivedBytes = _sendSocket.EndReceive(asyn);
+                bool isRemoteSocketClosing = _sendSocket.Poll(1, SelectMode.SelectRead);
+
+                if (isRemoteSocketClosing && numReceivedBytes == 0)
                 {
-                    ServerMain.Log(lstLog, "EVNT: OnDataReceived(); Disconnesso dal Server");
+                    Log("EVNT: OnDataReceived(); Disconnesso dal Client");
+                    Log("CALL: Close();");
+                    _sendSocket.Close();
+                    _sendSocket = null;
 
-                    Stato = Status.Listening;
-                    layout();
+                    // Aggiorna lo stato e la UI
+                    _stato = Stato.Listening;
+                    UpdateLayout();
+
+                    return;
                 }
+
+                Log("EVNT: OnDataReceived();");
+                string szData = System.Text.Encoding.ASCII.GetString(receivedBytesBuffer, 0, numReceivedBytes);
+                DatiRxTextBox.Text += szData;
+                Log("CALL: BeginReceive(); Pronto a ricevere");
+                _sendSocket.BeginReceive(receivedBytesBuffer, 0, receivedBytesBuffer.Length, SocketFlags.None, new AsyncCallback(OnDataReceived), _sendSocket);
             }
-
             catch (ObjectDisposedException)
             {
-                ServerMain.Log(lstLog, "EVNT: OnDataReceived(); Errore ObjectDisposedException");
+                Log("EVNT: OnDataReceived(); Errore ObjectDisposedException");
                 MessageBox.Show("ObjectDisposedException", "Server");
             }
-
             catch (SocketException se)
             {
-                ServerMain.Log(lstLog, "EVNT: OnDataReceived(); Errore " + se.Message);
+                Log("EVNT: OnDataReceived(); Errore " + se.Message);
                 MessageBox.Show(se.Message, "Server");
             }
-
-
         }
-
 
         private delegate void del_OnDisconnect(IAsyncResult asyn);
         public void OnDisconnect(IAsyncResult asyn)
         {
+            // Fa in modo che questa funzione venga eseguita nel thread corretto
             if (InvokeRequired)
             {
                 BeginInvoke(new del_OnDisconnect(OnDisconnect), asyn);
                 return;
             }
-            ServerMain.Log(lstLog, "EVNT: OnDisconnect(); Disconnessione");
-            m_socWorker.EndDisconnect(asyn);
-            ServerMain.Log(lstLog, "CALL: Close(); Socket chiuso");
-            m_socWorker.Close();
+
+            Log("EVNT: OnDisconnect(); Disconnessione");
+            _sendSocket.EndDisconnect(asyn);
+            Log("CALL: Close(); Socket chiuso");
+            _sendSocket.Close();
         }
 
-
-        #endregion
-
-
-
-
-
-        #region R O U T I N E S 
-
-        private void layout()
+        private void UpdateLayout()
         {
-            switch (Stato)
+            switch (_stato)
             {
-                case Status.Iniziale:
-                    gboxSettings.Enabled = true;
-                    gboxDatiTx.Enabled = false;
-                    gboxDatiRx.Enabled = false;
-                    cmdListen.Enabled = true;
-                    cmdStopListening.Enabled = false;
-                    cmdSend.Enabled = false;
-                    cmdDisconnect.Enabled = false;
+                case Stato.Iniziale:
+                    SettingsGroupBox.Enabled = true;
+                    DatiTxGroupBox.Enabled = false;
+                    DatiRxGroupBox.Enabled = false;
+                    StartListeningButton.Enabled = true;
+                    StopListeningButton.Enabled = false;
+                    SendButton.Enabled = false;
+                    DisconnectButton.Enabled = false;
                     break;
-
-                case Status.Listening:
-                    gboxSettings.Enabled = false;
-                    gboxDatiTx.Enabled = false;
-                    gboxDatiRx.Enabled = false;
-                    cmdListen.Enabled = false;
-                    cmdStopListening.Enabled = true;
-                    cmdSend.Enabled = false;
-                    cmdDisconnect.Enabled = false;
+                case Stato.Listening:
+                    SettingsGroupBox.Enabled = false;
+                    DatiTxGroupBox.Enabled = false;
+                    DatiRxGroupBox.Enabled = false;
+                    StartListeningButton.Enabled = false;
+                    StopListeningButton.Enabled = true;
+                    SendButton.Enabled = false;
+                    DisconnectButton.Enabled = false;
                     break;
-
-                case Status.Connesso:
-                    gboxSettings.Enabled = false;
-                    gboxDatiTx.Enabled = true;
-                    gboxDatiRx.Enabled = true;
-                    cmdListen.Enabled = false;
-                    cmdStopListening.Enabled = false;
-                    cmdSend.Enabled = true;
-                    cmdDisconnect.Enabled = true;
+                case Stato.Connesso:
+                    SettingsGroupBox.Enabled = false;
+                    DatiTxGroupBox.Enabled = true;
+                    DatiRxGroupBox.Enabled = true;
+                    StartListeningButton.Enabled = false;
+                    StopListeningButton.Enabled = false;
+                    SendButton.Enabled = true;
+                    DisconnectButton.Enabled = true;
                     break;
             }
         }
 
-        #endregion
-
-
-
-
-
-
-    }// Classe
-}//Namespace
+        private int intLogCount = 0;
+        private void Log(string message)
+        {
+            LogListBox.Items.Add(intLogCount.ToString().PadLeft(3) + " " + message);
+            LogListBox.SelectedIndex = LogListBox.Items.Count - 1;
+            intLogCount++;
+        }
+    }
+}
