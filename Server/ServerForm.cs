@@ -23,8 +23,9 @@ namespace ChatTCP.Server
 
         private readonly byte[] receivedBytesBuffer = new byte[DIMBUFF];
 
-        public Socket _receiveSocket;
-        public Socket _sendSocket;
+        public TcpListener _listener;
+        public TcpClient _sendSocket;
+        public NetworkStream _sendStream;
 
         public ServerForm()
         {
@@ -46,24 +47,14 @@ namespace ChatTCP.Server
 
         private void ServerForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (_sendSocket != null)
-            {
-                if (_sendSocket.Connected)
-                {
-                    MessageBox.Show("Connessione aperta", "Client");
-                    e.Cancel = true;
-                    return;
-                }
-            }
-
             try
             {
-                if (_receiveSocket != null)
-                {
-                    Log("CALL: Close(); socket Listener");
-                    _receiveSocket.Close();
-                    _receiveSocket = null;
-                }
+                Log("CALL: Close(); socket Listener");
+
+                DisconnectClients();
+
+                _listener?.Stop();
+                _listener = null;
             }
             catch (SocketException se)
             {
@@ -92,19 +83,15 @@ namespace ChatTCP.Server
                 Log("-------------------------");
 
                 // Crea socket di ricezione
-                _receiveSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-                // Associazione dell'endpoint (indirizzo IP locale/porta TCP) al socket
-                IPEndPoint ipLocal = new IPEndPoint(IPAddress.Any, port);
-                _receiveSocket.Bind(ipLocal);
-                Log($"CALL: Bind(); Socket creato e associato ({IPAddress.Any}:{portString})");
+                _listener = new TcpListener(IPAddress.Any, port);
+                Log($"CALL: Listener creato ({IPAddress.Any}:{portString})");
 
                 // Avvio listening sulla porta TCP nota
-                _receiveSocket.Listen(4);
+                _listener.Start();
                 Log("CALL: Listen(); Socket in listening");
 
                 // Creazione funzione di callback per accettare connessioni
-                _receiveSocket.BeginAccept(new AsyncCallback(OnAccept), null);
+                _listener.BeginAcceptTcpClient(new AsyncCallback(OnAccept), null);
                 Log("CALL: BeginAccept(); Callback BeginAccept impostata");
 
                 // Aggiorna lo stato e la UI
@@ -121,19 +108,16 @@ namespace ChatTCP.Server
         {
             try
             {
-                if (_receiveSocket != null)
-                {
-                    Log("CALL: Close(); socket Listener");
-                    _receiveSocket.Close();
-                    _receiveSocket = null;
+                Log("CALL: Close(); socket Listener");
 
-                    _stato = Stato.Iniziale;
-                    UpdateLayout();
-                }
-                else
-                {
-                    MessageBox.Show("Socket listener nullo", "Server");
-                }
+                DisconnectClients();
+
+                _listener?.Stop();
+                _listener = null;
+
+                // Aggiorna lo stato e la UI
+                _stato = Stato.Iniziale;
+                UpdateLayout();
             }
             catch (SocketException se)
             {
@@ -161,7 +145,7 @@ namespace ChatTCP.Server
                 }
 
                 Log("CALL: Send();");
-                _sendSocket.Send(messageBytes);
+                _sendStream.Write(messageBytes, 0, messageBytes.Length);
             }
             catch (SocketException se)
             {
@@ -183,8 +167,24 @@ namespace ChatTCP.Server
                 return;
             }
 
-            Log("CALL: BeginDisconnect(); Richiesta disconnessione");
-            _sendSocket.BeginDisconnect(false, new AsyncCallback(OnDisconnect), _sendSocket);
+            DisconnectClients();
+        }
+
+        private void DisconnectClients()
+        {
+            Log("CALL: DisconnectClients(); Richiesta disconnessione");
+
+            _sendStream?.Close();
+            _sendStream?.Dispose();
+            _sendStream = null;
+
+            _sendSocket?.Close();
+            _sendSocket?.Dispose();
+            _sendSocket = null;
+
+            // Aggiorna lo stato e la UI
+            _stato = Stato.Listening;
+            UpdateLayout();
         }
 
         private delegate void del_OnAccept(IAsyncResult asyn);
@@ -197,7 +197,7 @@ namespace ChatTCP.Server
                 return;
             }
 
-            if (_receiveSocket == null)
+            if (_listener == null)
             {
                 Log("EVNT: BeginAccept(); Listener nullo");
                 return;
@@ -205,11 +205,12 @@ namespace ChatTCP.Server
 
             try
             {
-                _sendSocket = _receiveSocket.EndAccept(asyn);
+                _sendSocket = _listener.EndAcceptTcpClient(asyn);
                 Log("EVNT: BeginAccept(); Connessione accettata");
 
                 Log("CALL: BeginReceive(); Pronto a ricevere");
-                _sendSocket.BeginReceive(receivedBytesBuffer, 0, receivedBytesBuffer.Length, SocketFlags.None, new AsyncCallback(OnDataReceived), _sendSocket);
+                _sendStream = _sendSocket.GetStream();
+                _sendStream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _sendStream);
 
                 // Aggiorna lo stato e la UI
                 _stato = Stato.Connesso;
@@ -217,7 +218,7 @@ namespace ChatTCP.Server
 
                 Log(".........................");
                 Log("CALL: BeginAccept(); BeginAccept REimpostata");
-                _receiveSocket.BeginAccept(new AsyncCallback(OnAccept), null);
+                _listener.BeginAcceptTcpClient(new AsyncCallback(OnAccept), null);
             }
             catch (ObjectDisposedException)
             {
@@ -243,7 +244,7 @@ namespace ChatTCP.Server
 
             try
             {
-                if (!_sendSocket.Connected)
+                if (_sendSocket == null || !_sendSocket.Connected)
                 {
                     Log("EVNT: OnDataReceived(); Disconnesso dal Server");
 
@@ -254,10 +255,9 @@ namespace ChatTCP.Server
                     return;
                 }
 
-                int numReceivedBytes = _sendSocket.EndReceive(asyn);
-                bool isRemoteSocketClosing = _sendSocket.Poll(1, SelectMode.SelectRead);
+                int numReceivedBytes = _sendStream.EndRead(asyn);
 
-                if (isRemoteSocketClosing && numReceivedBytes == 0)
+                if (numReceivedBytes == 0)
                 {
                     Log("EVNT: OnDataReceived(); Disconnesso dal Client");
                     Log("CALL: Close();");
@@ -275,7 +275,7 @@ namespace ChatTCP.Server
                 string szData = System.Text.Encoding.ASCII.GetString(receivedBytesBuffer, 0, numReceivedBytes);
                 DatiRxTextBox.Text += szData;
                 Log("CALL: BeginReceive(); Pronto a ricevere");
-                _sendSocket.BeginReceive(receivedBytesBuffer, 0, receivedBytesBuffer.Length, SocketFlags.None, new AsyncCallback(OnDataReceived), _sendSocket);
+                _sendStream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _sendSocket);
             }
             catch (ObjectDisposedException)
             {
@@ -287,22 +287,6 @@ namespace ChatTCP.Server
                 Log("EVNT: OnDataReceived(); Errore " + se.Message);
                 MessageBox.Show(se.Message, "Server");
             }
-        }
-
-        private delegate void del_OnDisconnect(IAsyncResult asyn);
-        public void OnDisconnect(IAsyncResult asyn)
-        {
-            // Fa in modo che questa funzione venga eseguita nel thread corretto
-            if (InvokeRequired)
-            {
-                BeginInvoke(new del_OnDisconnect(OnDisconnect), asyn);
-                return;
-            }
-
-            Log("EVNT: OnDisconnect(); Disconnessione");
-            _sendSocket.EndDisconnect(asyn);
-            Log("CALL: Close(); Socket chiuso");
-            _sendSocket.Close();
         }
 
         private void UpdateLayout()
