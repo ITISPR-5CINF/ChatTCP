@@ -13,6 +13,7 @@ namespace ChatTCP.Client
         private enum Stato
         {
             Disconnesso,
+            Connessione,
             Connesso
         }
         private Stato _stato;
@@ -115,6 +116,10 @@ namespace ChatTCP.Client
                 // Associazione dell'endpoint (indirizzo IP locale/porta TCP) al socket
                 _clientSocket.BeginConnect(ipAddress, port, new AsyncCallback(OnConnect), null);
                 Log("CALL: BeginConnect(); Richiesta connessione");
+
+                // Aggiorna lo stato e la UI
+                _stato = Stato.Connessione;
+                AggiornaLayout();
             }
             catch (SocketException se)
             {
@@ -195,6 +200,11 @@ namespace ChatTCP.Client
             {
                 Log("EVNT: OnConnect(); Connessione NON accettata");
                 MessageBox.Show("Impossibile connettersi", "Client");
+
+                // Aggiorna lo stato e la UI
+                _stato = Stato.Disconnesso;
+                AggiornaLayout();
+
                 return;
             }
 
@@ -269,6 +279,14 @@ namespace ChatTCP.Client
                     DatiTxGroupBox.Enabled = false;
                     DatiRxGroupBox.Enabled = false;
                     ConnectButton.Enabled = true;
+                    CloseButton.Enabled = false;
+                    SendButton.Enabled = false;
+                    break;
+                case Stato.Connessione:
+                    ImpostazioniGroupBox.Enabled = false;
+                    DatiTxGroupBox.Enabled = false;
+                    DatiRxGroupBox.Enabled = false;
+                    ConnectButton.Enabled = false;
                     CloseButton.Enabled = false;
                     SendButton.Enabled = false;
                     break;
