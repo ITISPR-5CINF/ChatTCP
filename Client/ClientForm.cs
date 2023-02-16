@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -23,7 +23,8 @@ namespace ChatTCP.Client
 
         private readonly byte[] receivedBytesBuffer = new byte[DIMBUFF];
 
-        private Socket _clientSocket;
+        private TcpClient _clientSocket;
+        private NetworkStream _stream;
 
         public ClientForm()
         {
@@ -108,15 +109,11 @@ namespace ChatTCP.Client
             try
             {
                 // Creazione del socket
-                Log("...........................");
-                _clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-                // Creazione dell'endpoint 
-                IPEndPoint ipRemote = new IPEndPoint(rawIpAddress, port);
+                _clientSocket = new TcpClient();
                 Log("CALL: Socket creato (" + ipAddressString + ":" + portString + ")");
 
                 // Associazione dell'endpoint (indirizzo IP locale/porta TCP) al socket
-                _clientSocket.BeginConnect(ipRemote, new AsyncCallback(OnConnect), null);
+                _clientSocket.BeginConnect(ipAddress, port, new AsyncCallback(OnConnect), null);
                 Log("CALL: BeginConnect(); Richiesta connessione");
             }
             catch (SocketException se)
@@ -140,7 +137,13 @@ namespace ChatTCP.Client
             }
 
             Log("CALL: BeginDisconnect(); Richiesta disconnessione");
-            _clientSocket.BeginDisconnect(false, new AsyncCallback(OnDisconnect), _clientSocket);
+            _stream.Close();
+            _clientSocket.Close();
+            _clientSocket.Dispose();
+
+            // Aggiorna lo stato e la UI
+            _stato = Stato.Disconnesso;
+            AggiornaLayout();
         }
 
         private void SendButton_Click(object sender, EventArgs e)
@@ -163,7 +166,7 @@ namespace ChatTCP.Client
                 }
 
                 Log("CALL: Send();");
-                _clientSocket.Send(messageBuffer);
+                _stream.Write(messageBuffer, 0, messageBuffer.Length);
             }
             catch (SocketException se)
             {
@@ -198,7 +201,8 @@ namespace ChatTCP.Client
             _clientSocket.EndConnect(asyn);
             Log("EVNT: OnConnect(); Connessione accettata");
             Log("CALL: BeginReceive(); Pronto a ricevere");
-            _clientSocket.BeginReceive(receivedBytesBuffer, 0, receivedBytesBuffer.Length, SocketFlags.None, new AsyncCallback(OnDataReceived), _clientSocket);
+            _stream = _clientSocket.GetStream();
+            _stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _stream);
 
             // Aggiorna lo stato e la UI
             _stato = Stato.Connesso;
@@ -223,10 +227,9 @@ namespace ChatTCP.Client
                     return;
                 }
 
-                int numReceivedBytes = _clientSocket.EndReceive(asyn);
-                bool isRemoteSocketClosing = _clientSocket.Poll(1, SelectMode.SelectRead);
+                int numReceivedBytes = _stream.EndRead(asyn);
 
-                if (isRemoteSocketClosing && numReceivedBytes == 0)
+                if (numReceivedBytes == 0)
                 {
                     Log("EVNT: OnDataReceived(); Disconnesso dal Server");
                     Log("CALL: Close();");
@@ -243,7 +246,7 @@ namespace ChatTCP.Client
                 string receivedMessage = System.Text.Encoding.ASCII.GetString(receivedBytesBuffer, 0, numReceivedBytes);
                 DatiRxTextBox.Text += receivedMessage;
                 Log("CALL: BeginReceive(); Pronto a ricevere");
-                _clientSocket.BeginReceive(receivedBytesBuffer, 0, receivedBytesBuffer.Length, SocketFlags.None, new AsyncCallback(OnDataReceived), _clientSocket);
+                _stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _stream);
             }
             catch (ObjectDisposedException)
             {
@@ -255,30 +258,6 @@ namespace ChatTCP.Client
                 Log("EVNT: OnDataReceived(); Errore " + se.Message);
                 MessageBox.Show(se.Message, "Client");
             }
-        }
-
-        private delegate void del_OnDisconnect(IAsyncResult asyn);
-        public void OnDisconnect(IAsyncResult asyn)
-        {
-            // Fa in modo che questa funzione venga eseguita nel thread corretto
-            if (InvokeRequired)
-            {
-                BeginInvoke(new del_OnDisconnect(OnDisconnect), asyn);
-                return;
-            }
-
-            Log("EVNT: OnDisconnect();");
-            _clientSocket.EndDisconnect(asyn);
-
-            Log("CALL: Shutdown();");
-            _clientSocket.Shutdown(SocketShutdown.Both);
-            Log("CALL: Close();");
-            _clientSocket.Close();
-            //m_socClient = null; //genera una eccezione globale
-
-            // Aggiorna lo stato e la UI
-            _stato = Stato.Disconnesso;
-            AggiornaLayout();
         }
 
         private void AggiornaLayout()
