@@ -4,6 +4,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Windows.Forms;
 
+using ChatTCP.Common;
+
 namespace ChatTCP.Client
 {
     public partial class ClientForm : Form
@@ -23,6 +25,7 @@ namespace ChatTCP.Client
         private const int DIMBUFF = 5;
 
         private readonly byte[] receivedBytesBuffer = new byte[DIMBUFF];
+        private string receivedString = null;
 
         private TcpClient _clientSocket;
         private NetworkStream _stream;
@@ -155,8 +158,12 @@ namespace ChatTCP.Client
         {
             try
             {
-                string message = DatiTxTextBox.Text;
-                byte[] messageBuffer = System.Text.Encoding.ASCII.GetBytes(message);
+                // Serializza il messaggio
+                string messageText = DatiTxTextBox.Text;
+                Protocol.SendMessageMessage sendMessageMessage = new Protocol.SendMessageMessage
+                {
+                    message = messageText
+                };
 
                 if (_clientSocket == null)
                 {
@@ -171,7 +178,8 @@ namespace ChatTCP.Client
                 }
 
                 Log("CALL: Send();");
-                _stream.Write(messageBuffer, 0, messageBuffer.Length);
+                var message = Protocol.EncodeMessage(sendMessageMessage.ToJson());
+                _stream.Write(message, 0, message.Length);
             }
             catch (SocketException se)
             {
@@ -253,8 +261,46 @@ namespace ChatTCP.Client
                 }
 
                 Log("EVNT: OnDataReceived();");
-                string receivedMessage = System.Text.Encoding.ASCII.GetString(receivedBytesBuffer, 0, numReceivedBytes);
-                DatiRxTextBox.Text += receivedMessage;
+
+                // Processa il messaggio ricevuto
+                string szData = Protocol.DecodeMessage(receivedBytesBuffer, numReceivedBytes);
+                DatiRxTextBox.Text += szData;
+
+                if (receivedString == null)
+                {
+                    receivedString = szData;
+                }
+                else
+                {
+                    receivedString += szData;
+                }
+                string maybeJsonString = Protocol.GetMessageOrNull(receivedString);
+                if (maybeJsonString != null)
+                {
+                    Protocol.BaseMessage message = Protocol.FromJson(maybeJsonString);
+
+                    if (message is Protocol.LoginNeededMessage loginNeededMessage)
+                    {
+                        // Apri il form
+                    }
+                    else if (message is Protocol.LoginResultMessage loginResultMessage)
+                    {
+                        // Salva il token?
+                    }
+                    else if (message is Protocol.MessageReceivedMessage messageReceivedMessage)
+                    {
+                        // Metti il messaggio nella UI
+                    }
+                    else
+                    {
+                        Log("Messaggio sconosciuto ricevuto dal server");
+                        Log(maybeJsonString);
+                    }
+
+                    receivedString = null;
+                }
+
+                // Torna ad ascoltare nuovi messaggi
                 Log("CALL: BeginReceive(); Pronto a ricevere");
                 _stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _stream);
             }

@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Windows.Forms;
+
+using ChatTCP.Common;
 
 namespace ChatTCP.Server
 {
@@ -22,6 +24,7 @@ namespace ChatTCP.Server
         private const int DIMBUFF = 5;
 
         private readonly byte[] receivedBytesBuffer = new byte[DIMBUFF];
+        private string receivedString = null;
 
         public TcpListener _listener;
         public TcpClient _sendSocket;
@@ -219,6 +222,12 @@ namespace ChatTCP.Server
                 Log(".........................");
                 Log("CALL: BeginAccept(); BeginAccept REimpostata");
                 _listener.BeginAcceptTcpClient(new AsyncCallback(OnAccept), null);
+
+                // Invia richiesta di login
+                var loginNeededMessage = new Protocol.LoginNeededMessage();
+                byte[] text = Protocol.EncodeMessage(loginNeededMessage.ToJson());
+                Log("Inviando richiesta di login al client");
+                _sendStream.Write(text, 0, text.Length);
             }
             catch (ObjectDisposedException)
             {
@@ -272,8 +281,46 @@ namespace ChatTCP.Server
                 }
 
                 Log("EVNT: OnDataReceived();");
-                string szData = System.Text.Encoding.ASCII.GetString(receivedBytesBuffer, 0, numReceivedBytes);
+
+                // Processa il messaggio ricevuto
+                string szData = Protocol.DecodeMessage(receivedBytesBuffer, numReceivedBytes);
                 DatiRxTextBox.Text += szData;
+
+                if (receivedString == null)
+                {
+                    receivedString = szData;
+                }
+                else
+                {
+                    receivedString += szData;
+                }
+                string maybeJsonString = Protocol.GetMessageOrNull(receivedString);
+                if (maybeJsonString != null)
+                {
+                    Protocol.BaseMessage message = Protocol.FromJson(maybeJsonString);
+
+                    if (message is Protocol.LoginMessage loginMessage)
+                    {
+                        // Fai il login
+                    }
+                    else if (message is Protocol.RegisterMessage registerMessage)
+                    {
+                        // Fai la registrazione
+                    }
+                    else if (message is Protocol.SendMessageMessage sendMessageMessage)
+                    {
+                        // Gestisci il messaggio
+                    }
+                    else
+                    {
+                        Log("Messaggio sconosciuto ricevuto dal client");
+                        Log(maybeJsonString);
+                    }
+
+                    receivedString = null;
+                }
+
+                // Torna ad ascoltare nuovi messaggi
                 Log("CALL: BeginReceive(); Pronto a ricevere");
                 _sendStream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _sendSocket);
             }
