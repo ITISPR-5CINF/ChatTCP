@@ -10,8 +10,6 @@ namespace ChatTCP.Client
 {
     public partial class ClientForm : Form
     {
-        private const string WINDOWTITLE = "Socket Client in C#";
-
         private enum Stato
         {
             Disconnesso,
@@ -37,9 +35,6 @@ namespace ChatTCP.Client
 
         private void ClientForm_Load(object sender, EventArgs e)
         {
-            // Imposta il titolo della finestra
-            Text = WINDOWTITLE;
-
             // Imposta porta di default
             PortaTcpTextBox.Text = Convert.ToString(DEFAULT_PORT);
 
@@ -159,7 +154,7 @@ namespace ChatTCP.Client
             try
             {
                 // Serializza il messaggio
-                string messageText = DatiTxTextBox.Text;
+                string messageText = SendTextBox.Text;
                 Protocol.SendMessageMessage sendMessageMessage = new Protocol.SendMessageMessage
                 {
                     message = messageText
@@ -181,7 +176,7 @@ namespace ChatTCP.Client
                 var message = Protocol.EncodeMessage(sendMessageMessage.ToJson());
                 _stream.Write(message, 0, message.Length);
 
-                Log($"Io: {sendMessageMessage.message}");
+                AddMessageToUI("Io", sendMessageMessage.message);
             }
             catch (SocketException se)
             {
@@ -266,7 +261,6 @@ namespace ChatTCP.Client
 
                 // Processa il messaggio ricevuto
                 string szData = Protocol.DecodeMessage(receivedBytesBuffer, numReceivedBytes);
-                DatiRxTextBox.Text += szData;
 
                 if (receivedString == null)
                 {
@@ -324,7 +318,7 @@ namespace ChatTCP.Client
                     else if (message is Protocol.MessageReceivedMessage messageReceivedMessage)
                     {
                         // Metti il messaggio nella UI
-                        Log($"{messageReceivedMessage.username}: {messageReceivedMessage.message}");
+                        AddMessageToUI(messageReceivedMessage.username, messageReceivedMessage.message);
                     }
                     else
                     {
@@ -357,24 +351,21 @@ namespace ChatTCP.Client
             {
                 case Stato.Disconnesso:
                     ImpostazioniGroupBox.Enabled = true;
-                    DatiTxGroupBox.Enabled = false;
-                    DatiRxGroupBox.Enabled = false;
+                    SendGroupBox.Enabled = false;
                     ConnectButton.Enabled = true;
                     CloseButton.Enabled = false;
                     SendButton.Enabled = false;
                     break;
                 case Stato.Connessione:
                     ImpostazioniGroupBox.Enabled = false;
-                    DatiTxGroupBox.Enabled = false;
-                    DatiRxGroupBox.Enabled = false;
+                    SendGroupBox.Enabled = false;
                     ConnectButton.Enabled = false;
                     CloseButton.Enabled = false;
                     SendButton.Enabled = false;
                     break;
                 case Stato.Connesso:
                     ImpostazioniGroupBox.Enabled = false;
-                    DatiTxGroupBox.Enabled = true;
-                    DatiRxGroupBox.Enabled = true;
+                    SendGroupBox.Enabled = true;
                     ConnectButton.Enabled = false;
                     CloseButton.Enabled = true;
                     SendButton.Enabled = true;
@@ -483,11 +474,17 @@ namespace ChatTCP.Client
             return strIpDotted;
         }
 
+        private void AddMessageToUI(string username, string message)
+        {
+            MessagesListBox.Items.Add($"{username}: {message}");
+            MessagesListBox.SelectedIndex = MessagesListBox.Items.Count - 1;
+        }
+
         private int intLogCount = 0;
         private void Log(string message)
         {
-            LogListBox.Items.Add(intLogCount.ToString().PadLeft(3) + " " + message);
-            LogListBox.SelectedIndex = LogListBox.Items.Count - 1;
+            LoggingListBox.Items.Add(intLogCount.ToString().PadLeft(3) + " " + message);
+            LoggingListBox.SelectedIndex = LoggingListBox.Items.Count - 1;
             intLogCount++;
         }
     }
