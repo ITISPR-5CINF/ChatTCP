@@ -282,6 +282,20 @@ namespace ChatTCP.Client
                     if (message is Protocol.LoginNeededMessage loginNeededMessage)
                     {
                         // Apri il form
+                        var formLogin = new FormLogin();
+                        formLogin.ShowDialog();
+
+                        var username = formLogin.Username;
+                        var password = formLogin.Password;
+
+                        var loginMessage = new Protocol.LoginMessage
+                        {
+                            username = username,
+                            password = password
+                        };
+
+                        var messageBytes = Protocol.EncodeMessage(loginMessage.ToJson());
+                        _stream.Write(messageBytes, 0, messageBytes.Length);
                     }
                     else if (message is Protocol.LoginResultMessage loginResultMessage)
                     {
