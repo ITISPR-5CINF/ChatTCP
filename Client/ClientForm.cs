@@ -44,7 +44,7 @@ namespace ChatTCP.Client
             PortaTcpTextBox.Text = Convert.ToString(DEFAULT_PORT);
 
             // Ricavo tutti i nomi dei pc in rete
-            List<string> NetComputers = DLLWrapper_Netapi32.GetNetworkComputers();
+            List<string> NetComputers = BroadcastDomainUtils.GetNetComputers();
             // Aggiungo il computer locale
             NetComputers.Insert(0, "localhost");
             // Li inserisco nel combo
