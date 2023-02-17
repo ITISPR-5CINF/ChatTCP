@@ -8,6 +8,11 @@ namespace ChatTCP.Client
     {
         public string Username => UsernameTextBox.Text;
         public string Password => PasswordTextBox.Text;
+        public string Nome = "";
+        public string Cognome = "";
+        public string UsernameRegister = "";
+        public string PasswordRegister = "";
+        public bool isRegisteredInstruction = false;
 
         public FormLogin()
         {
@@ -29,14 +34,15 @@ namespace ChatTCP.Client
         {
             FormSignin signin = new FormSignin();
             signin.ShowDialog();
-            /*
-            if (message is Protocol.RegisterMessage registerNewMessage)
-            {
-                var registerMessage = new Protocol.RegisterMessage
-                {
-                    nome = 
-                };
-            }*/
+
+            Nome = signin.Nome;
+            Cognome= signin.Cognome;
+            UsernameRegister = signin.Username;
+            PasswordRegister = signin.Password;
+
+            isRegisteredInstruction= true;
+
+            Close();
         }
     }
 }

@@ -281,17 +281,38 @@ namespace ChatTCP.Client
                         var formLogin = new FormLogin();
                         formLogin.ShowDialog();
 
-                        var username = formLogin.Username;
-                        var password = formLogin.Password;
-
-                        var loginMessage = new Protocol.LoginMessage
+                        if (!formLogin.isRegisteredInstruction)
                         {
-                            username = username,
-                            password = password
-                        };
+                            var username = formLogin.Username;
+                            var password = formLogin.Password;
 
-                        var messageBytes = Protocol.EncodeMessage(loginMessage.ToJson());
-                        _stream.Write(messageBytes, 0, messageBytes.Length);
+                            var loginMessage = new Protocol.LoginMessage
+                            {
+                                username = username,
+                                password = password
+                            };
+
+                            var messageBytes = Protocol.EncodeMessage(loginMessage.ToJson());
+                            _stream.Write(messageBytes, 0, messageBytes.Length);
+                        }
+                        else
+                        {
+                            var username = formLogin.UsernameRegister;
+                            var password = formLogin.PasswordRegister;
+                            var nome = formLogin.Nome;
+                            var cognome = formLogin.Cognome;
+
+                            var registerMessage = new Protocol.RegisterMessage
+                            {
+                                username = username,
+                                password = password,
+                                nome = nome,
+                                cognome = cognome
+                            };
+
+                            var messageBytes = Protocol.EncodeMessage(registerMessage.ToJson());
+                            _stream.Write(messageBytes, 0, messageBytes.Length);
+                        }
                     }
                     else if (message is Protocol.LoginResultMessage loginResultMessage)
                     {
