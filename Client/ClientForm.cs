@@ -180,6 +180,8 @@ namespace ChatTCP.Client
                 Log("CALL: Send();");
                 var message = Protocol.EncodeMessage(sendMessageMessage.ToJson());
                 _stream.Write(message, 0, message.Length);
+
+                Log($"Io: {sendMessageMessage.message}");
             }
             catch (SocketException se)
             {
@@ -304,6 +306,7 @@ namespace ChatTCP.Client
                     else if (message is Protocol.MessageReceivedMessage messageReceivedMessage)
                     {
                         // Metti il messaggio nella UI
+                        Log($"{messageReceivedMessage.username}: {messageReceivedMessage.message}");
                     }
                     else
                     {
