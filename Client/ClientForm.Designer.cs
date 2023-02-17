@@ -114,27 +114,28 @@
             // 
             this.MessagesListBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.MessagesListBox.FormattingEnabled = true;
-            this.MessagesListBox.Location = new System.Drawing.Point(179, 12);
+            this.MessagesListBox.Location = new System.Drawing.Point(6, 19);
             this.MessagesListBox.Name = "MessagesListBox";
-            this.MessagesListBox.Size = new System.Drawing.Size(393, 303);
+            this.MessagesListBox.Size = new System.Drawing.Size(379, 342);
             this.MessagesListBox.TabIndex = 7;
             // 
             // SendGroupBox
             // 
             this.SendGroupBox.Controls.Add(this.SendButton);
             this.SendGroupBox.Controls.Add(this.SendTextBox);
-            this.SendGroupBox.Location = new System.Drawing.Point(180, 331);
+            this.SendGroupBox.Controls.Add(this.MessagesListBox);
+            this.SendGroupBox.Location = new System.Drawing.Point(180, 12);
             this.SendGroupBox.Name = "SendGroupBox";
-            this.SendGroupBox.Size = new System.Drawing.Size(391, 81);
+            this.SendGroupBox.Size = new System.Drawing.Size(391, 400);
             this.SendGroupBox.TabIndex = 8;
             this.SendGroupBox.TabStop = false;
-            this.SendGroupBox.Text = "Invia un messaggio";
+            this.SendGroupBox.Text = "Messaggi";
             // 
             // SendButton
             // 
-            this.SendButton.Location = new System.Drawing.Point(335, 51);
+            this.SendButton.Location = new System.Drawing.Point(335, 367);
             this.SendButton.Name = "SendButton";
-            this.SendButton.Size = new System.Drawing.Size(50, 24);
+            this.SendButton.Size = new System.Drawing.Size(50, 25);
             this.SendButton.TabIndex = 1;
             this.SendButton.Text = "Send";
             this.SendButton.Click += new System.EventHandler(this.SendButton_Click);
@@ -142,11 +143,10 @@
             // SendTextBox
             // 
             this.SendTextBox.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.SendTextBox.Location = new System.Drawing.Point(6, 19);
-            this.SendTextBox.Multiline = true;
+            this.SendTextBox.Location = new System.Drawing.Point(6, 370);
             this.SendTextBox.Name = "SendTextBox";
             this.SendTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.SendTextBox.Size = new System.Drawing.Size(323, 56);
+            this.SendTextBox.Size = new System.Drawing.Size(323, 20);
             this.SendTextBox.TabIndex = 0;
             // 
             // LoggingGroupBox
@@ -176,7 +176,6 @@
             this.ClientSize = new System.Drawing.Size(583, 423);
             this.Controls.Add(this.LoggingGroupBox);
             this.Controls.Add(this.SendGroupBox);
-            this.Controls.Add(this.MessagesListBox);
             this.Controls.Add(this.CloseButton);
             this.Controls.Add(this.ImpostazioniGroupBox);
             this.Controls.Add(this.ConnectButton);
