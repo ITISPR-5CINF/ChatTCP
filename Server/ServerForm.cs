@@ -132,8 +132,13 @@ namespace ChatTCP.Server
         {
             try
             {
-                string message = DatiTxTextBox.Text;
-                byte[] messageBytes = System.Text.Encoding.ASCII.GetBytes(message);
+                string messageText = DatiTxTextBox.Text;
+                Protocol.MessageReceivedMessage messageReceivedMessage = new Protocol.MessageReceivedMessage
+                {
+                    username = "admin",
+                    message = messageText
+                };
+                var messageBytes = Protocol.EncodeMessage(messageReceivedMessage.ToJson());
 
                 foreach (var clients in _clients)
                 {
@@ -151,7 +156,6 @@ namespace ChatTCP.Server
 
                     Log("CALL: Send();");
                     clients.GetStream().Write(messageBytes, 0, messageBytes.Length);
-
                 }
 
             }
