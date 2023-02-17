@@ -58,14 +58,7 @@ namespace ChatTCP.Client
 
         private void ClientForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (_clientSocket != null)
-            {
-                if (_clientSocket.Connected)
-                {
-                    MessageBox.Show("Connessione aperta", "Client");
-                    e.Cancel = true;
-                }
-            }
+            CloseConnection();
         }
 
         private void ConnectButton_Click(object sender, EventArgs e)
@@ -127,26 +120,7 @@ namespace ChatTCP.Client
 
         private void CloseButton_Click(object sender, EventArgs e)
         {
-            if (_clientSocket == null)
-            {
-                MessageBox.Show("Client nullo", "Client");
-                return;
-            }
-
-            if (!_clientSocket.Connected)
-            {
-                MessageBox.Show("Client non connesso", "Client");
-                return;
-            }
-
-            Log("CALL: BeginDisconnect(); Richiesta disconnessione");
-            _stream.Close();
-            _clientSocket.Close();
-            _clientSocket.Dispose();
-
-            // Aggiorna lo stato e la UI
-            _stato = Stato.Disconnesso;
-            AggiornaLayout();
+            CloseConnection();
         }
 
         private void SendButton_Click(object sender, EventArgs e)
@@ -236,7 +210,7 @@ namespace ChatTCP.Client
 
             try
             {
-                if (!_clientSocket.Connected)
+                if (_clientSocket == null || !_clientSocket.Connected)
                 {
                     Log("EVNT: OnDataReceived(); Disconnesso dal Client");
                     return;
@@ -248,12 +222,9 @@ namespace ChatTCP.Client
                 {
                     Log("EVNT: OnDataReceived(); Disconnesso dal Server");
                     Log("CALL: Close();");
-                    _clientSocket.Close();
-                    _clientSocket = null;
 
-                    // Aggiorna lo stato e la UI
-                    _stato = Stato.Disconnesso;
-                    AggiornaLayout();
+                    CloseConnection();
+
                     return;
                 }
 
@@ -281,7 +252,7 @@ namespace ChatTCP.Client
                         if (!OpenLoginForm())
                         {
                             // Chiudi la connessione
-                            CloseButton_Click(null, null);
+                            CloseConnection();
                         }
                     }
                     else if (message is Protocol.LoginResultMessage loginResultMessage)
@@ -293,7 +264,7 @@ namespace ChatTCP.Client
                             if (!OpenLoginForm())
                             {
                                 // Chiudi la connessione
-                                CloseButton_Click(null, null);
+                                CloseConnection();
                             }
                         }
                     }
@@ -313,12 +284,7 @@ namespace ChatTCP.Client
 
                 // Torna ad ascoltare nuovi messaggi
                 Log("CALL: BeginReceive(); Pronto a ricevere");
-                _stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _stream);
-            }
-            catch (ObjectDisposedException)
-            {
-                Log("EVNT: OnDataReceived(); Errore ObjectDisposedException");
-                MessageBox.Show("ObjectDisposedException", "Client");
+                _stream?.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _stream);
             }
             catch (SocketException se)
             {
@@ -376,6 +342,23 @@ namespace ChatTCP.Client
             }
 
             return true;
+        }
+
+        private void CloseConnection()
+        {
+            Log("CALL: CloseConnection(); Richiesta disconnessione");
+
+            // Chiudi la stream
+            _stream?.Close();
+            _stream = null;
+
+            // Chiudi la connessione
+            _clientSocket?.Close();
+            _clientSocket = null;
+
+            // Aggiorna lo stato e la UI
+            _stato = Stato.Disconnesso;
+            AggiornaLayout();
         }
 
         private void AggiornaLayout()
