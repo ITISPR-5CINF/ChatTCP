@@ -343,8 +343,13 @@ namespace ChatTCP.Server
                     }
                     else if (message is Protocol.SendMessageMessage sendMessageMessage)
                     {
-                        // Gestisci il messaggio
-                        byte[] bytes = Protocol.EncodeMessage(sendMessageMessage.ToJson());
+                        // Invia il messaggio agli altri client
+                        var messageReceivedMessage = new Protocol.MessageReceivedMessage
+                        {
+                            username = "TBD",
+                            message = sendMessageMessage.message
+                        };
+                        byte[] bytes = Protocol.EncodeMessage(messageReceivedMessage.ToJson());
 
                         foreach (var clients in _clients)
                         {
