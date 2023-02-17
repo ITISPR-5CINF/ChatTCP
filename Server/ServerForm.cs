@@ -28,7 +28,7 @@ namespace ChatTCP.Server
         private string receivedString = null;
 
         public TcpListener _listener;
-        private List<TcpClient> _clients = new List<TcpClient>();
+        private readonly List<TcpClient> _clients = new List<TcpClient>();
 
         public ServerForm()
         {
@@ -168,18 +168,6 @@ namespace ChatTCP.Server
 
         private void DisconnectButton_Click(object sender, EventArgs e)
         {
-            //if (_sendSocket == null)
-            //{
-            //    MessageBox.Show("Socket di invio nullo", "Server");
-            //    return;
-            //}
-
-            //if (!_sendSocket.Connected)
-            //{
-            //    MessageBox.Show("Client non connesso", "Server");
-            //    return;
-            //}
-
             DisconnectClients();
         }
 
@@ -201,6 +189,9 @@ namespace ChatTCP.Server
                 client?.Close();
                 client?.Dispose();
             }
+
+            // Svuota la lista di client
+            _clients.Clear();
 
             // Aggiorna lo stato e la UI
             _stato = Stato.Listening;
