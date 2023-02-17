@@ -136,13 +136,13 @@ namespace ChatTCP.Client
 
                 if (_clientSocket == null)
                 {
-                    MessageBox.Show("Client nullo", "Client");
+                    Log("Client nullo");
                     return;
                 }
 
                 if (!_clientSocket.Connected)
                 {
-                    MessageBox.Show("Client non connesso", "Client");
+                    Log("Client non connesso");
                     return;
                 }
 
@@ -221,10 +221,7 @@ namespace ChatTCP.Client
                 if (numReceivedBytes == 0)
                 {
                     Log("EVNT: OnDataReceived(); Disconnesso dal Server");
-                    Log("CALL: Close();");
-
                     CloseConnection();
-
                     return;
                 }
 
@@ -244,6 +241,9 @@ namespace ChatTCP.Client
                 string maybeJsonString = Protocol.GetMessageOrNull(receivedString);
                 if (maybeJsonString != null)
                 {
+                    // Resetta il buffer della stringa ricevuta
+                    receivedString = null;
+
                     Protocol.BaseMessage message = Protocol.FromJson(maybeJsonString);
 
                     if (message is Protocol.LoginNeededMessage loginNeededMessage)
@@ -278,8 +278,6 @@ namespace ChatTCP.Client
                         Log("Messaggio sconosciuto ricevuto dal server");
                         Log(maybeJsonString);
                     }
-
-                    receivedString = null;
                 }
 
                 // Torna ad ascoltare nuovi messaggi

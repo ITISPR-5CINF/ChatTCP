@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Windows.Forms;
-using System.Collections.Generic;
 
 using ChatTCP.Common;
 
@@ -15,8 +16,7 @@ namespace ChatTCP.Server
         private enum Stato
         {
             Iniziale,
-            Listening,
-            Connesso
+            Listening
         }
         private Stato _stato;
 
@@ -27,7 +27,7 @@ namespace ChatTCP.Server
         private readonly byte[] receivedBytesBuffer = new byte[DIMBUFF];
         private string receivedString = null;
 
-        public TcpListener _listener;
+        private TcpListener _listener;
         private readonly List<TcpClient> _clients = new List<TcpClient>();
 
         public ServerForm()
@@ -50,19 +50,7 @@ namespace ChatTCP.Server
 
         private void ServerForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            try
-            {
-                Log("CALL: Close(); socket Listener");
-
-                DisconnectClients();
-
-                _listener?.Stop();
-                _listener = null;
-            }
-            catch (SocketException se)
-            {
-                MessageBox.Show(se.Message, "Server");
-            }
+            StopListener();
         }
 
         private void StartListeningButton_Click(object sender, EventArgs e)
@@ -109,92 +97,106 @@ namespace ChatTCP.Server
 
         private void StopListeningButton_Click(object sender, EventArgs e)
         {
-            try
-            {
-                Log("CALL: Close(); socket Listener");
-
-                DisconnectClients();
-
-                _listener?.Stop();
-                _listener = null;
-
-                // Aggiorna lo stato e la UI
-                _stato = Stato.Iniziale;
-                UpdateLayout();
-            }
-            catch (SocketException se)
-            {
-                MessageBox.Show(se.Message, "Server");
-            }
+            StopListener();
         }
 
         private void SendButton_Click(object sender, EventArgs e)
         {
-            try
+            string messageText = DatiTxTextBox.Text;
+            Protocol.MessageReceivedMessage messageReceivedMessage = new Protocol.MessageReceivedMessage
             {
-                string messageText = DatiTxTextBox.Text;
-                Protocol.MessageReceivedMessage messageReceivedMessage = new Protocol.MessageReceivedMessage
+                username = "admin",
+                message = messageText
+            };
+            var messageBytes = Protocol.EncodeMessage(messageReceivedMessage.ToJson());
+
+            foreach (var client in _clients.ToList())
+            {
+                if (!client.Connected)
                 {
-                    username = "admin",
-                    message = messageText
-                };
-                var messageBytes = Protocol.EncodeMessage(messageReceivedMessage.ToJson());
-
-                foreach (var clients in _clients)
-                {
-                    if (clients == null)
-                    {
-                        MessageBox.Show("Socket di invio nullo", "Server");
-                        return;
-                    }
-
-                    if (!clients.Connected)
-                    {
-                        MessageBox.Show("Client non connesso", "Server");
-                        return;
-                    }
-
-                    Log("CALL: Send();");
-                    clients.GetStream().Write(messageBytes, 0, messageBytes.Length);
+                    Log("Client non connesso");
+                    DisconnectClient(client);
+                    continue;
                 }
 
-                Log($"{messageReceivedMessage.username}: {messageReceivedMessage.message}");
+                client.GetStream().Write(messageBytes, 0, messageBytes.Length);
             }
-            catch (SocketException se)
-            {
-                MessageBox.Show(se.Message, "Server");
-            }
+
+            Log($"{messageReceivedMessage.username}: {messageReceivedMessage.message}");
         }
 
         private void DisconnectButton_Click(object sender, EventArgs e)
         {
-            DisconnectClients();
+            DisconnectAllClients();
         }
 
-        private void DisconnectClients()
+        /// <summary>
+        /// Disconnette un client e lo rimuove dalla lista di clients conosciuti
+        /// </summary>
+        /// <param name="client">il client da disconnettere</param>
+        private void DisconnectClient(TcpClient client)
+        {
+            if (client == null)
+            {
+                return;
+            }
+
+            // Rimuovi l'oggetto dalla lista prima di distruggerlo
+            _clients.Remove(client);
+
+            // Prova a distruggere l'oggetto
+            try {
+                // Chiudi la stream
+                var stream = client.GetStream();
+                try
+                {
+                    stream?.Close();
+                }
+                catch (ObjectDisposedException) {
+                    // Ci abbiamo provato
+                }
+
+                // Chiudi definitivamente il client
+                client?.Close();
+            } catch (ObjectDisposedException) {
+                // Ci abbiamo provato
+            }
+        }
+
+        /// <summary>
+        /// Disconnetti tutti i client connessi
+        /// </summary>
+        private void DisconnectAllClients()
         {
             Log("CALL: DisconnectClients(); Richiesta disconnessione");
 
-            foreach (TcpClient client in _clients)
+            // Crea una copia della lista perchè durante l'iterazione non
+            // si può modificare la lista originale
+            foreach (TcpClient client in _clients.ToList())
             {
-                if (client == null)
-                {
-                    continue;
-                }
-
-                var stream = client.GetStream();
-                stream?.Close();
-                stream?.Dispose();
-
-                client?.Close();
-                client?.Dispose();
+                DisconnectClient(client);
             }
 
             // Svuota la lista di client
             _clients.Clear();
+        }
+
+        /// <summary>
+        /// Disconnetti tutti i client connessi e ferma il listener
+        /// </summary>
+        private void StopListener()
+        {
+            Log("CALL: StopListener(); socket listener");
+
+            // Disconnetti tutti i client
+            DisconnectAllClients();
+
+            // Ferma il listener
+            _listener?.Stop();
+            _listener = null;
 
             // Aggiorna lo stato e la UI
-            _stato = Stato.Listening;
+            _stato = Stato.Iniziale;
             UpdateLayout();
         }
 
@@ -225,24 +227,16 @@ namespace ChatTCP.Server
                 var stream = client.GetStream();
                 stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), client);
 
-                // Aggiorna lo stato e la UI
-                _stato = Stato.Connesso;
-                UpdateLayout();
-
-                Log(".........................");
-                Log("CALL: BeginAccept(); BeginAccept REimpostata");
-                _listener.BeginAcceptTcpClient(new AsyncCallback(OnAccept), null);
-
                 // Invia richiesta di login
                 var loginNeededMessage = new Protocol.LoginNeededMessage();
                 byte[] text = Protocol.EncodeMessage(loginNeededMessage.ToJson());
                 Log("Inviando richiesta di login al client");
                 stream.Write(text, 0, text.Length);
-            }
-            catch (ObjectDisposedException)
-            {
-                Log("EVNT: BeginAccept(); Errore: ObjectDisposedException");
-                MessageBox.Show("ObjectDisposedException", "Server");
+
+                // Torna ad ascoltare nuove richieste di connessione
+                Log(".........................");
+                Log("CALL: BeginAccept(); BeginAccept REimpostata");
+                _listener.BeginAcceptTcpClient(new AsyncCallback(OnAccept), null);
             }
             catch (SocketException se)
             {
@@ -261,21 +255,23 @@ namespace ChatTCP.Server
                 return;
             }
 
+            var client = (TcpClient)asyn.AsyncState;
+
+            if (client == null)
+            {
+                Log("EVNT: OnDataReceived(); Client nullo");
+                return;
+            }
+
+            if (!client.Connected)
+            {
+                Log("EVNT: OnDataReceived(); Client non connesso");
+                DisconnectClient(client);
+                return;
+            }
+
             try
             {
-                var client = (TcpClient)asyn.AsyncState;
-
-                if (client == null || !client.Connected)
-                {
-                    Log("EVNT: OnDataReceived(); Disconnesso dal Server");
-
-                    // Aggiorna lo stato e la UI
-                    _stato = Stato.Listening;
-                    UpdateLayout();
-
-                    return;
-                }
-
                 var stream = client.GetStream();
 
                 int numReceivedBytes = stream.EndRead(asyn);
@@ -283,14 +279,7 @@ namespace ChatTCP.Server
                 if (numReceivedBytes == 0)
                 {
                     Log("EVNT: OnDataReceived(); Disconnesso dal Client");
-                    Log("CALL: Close();");
-                    client.Close();
-                    client = null;
-
-                    // Aggiorna lo stato e la UI
-                    _stato = Stato.Listening;
-                    UpdateLayout();
-
+                    DisconnectClient(client);
                     return;
                 }
 
@@ -311,6 +300,9 @@ namespace ChatTCP.Server
                 string maybeJsonString = Protocol.GetMessageOrNull(receivedString);
                 if (maybeJsonString != null)
                 {
+                    // Resetta il buffer della stringa ricevuta
+                    receivedString = null;
+
                     Protocol.BaseMessage message = Protocol.FromJson(maybeJsonString);
 
                     if (message is Protocol.LoginMessage loginMessage)
@@ -343,8 +335,15 @@ namespace ChatTCP.Server
                         };
                         byte[] bytes = Protocol.EncodeMessage(messageReceivedMessage.ToJson());
 
-                        foreach (var clients in _clients)
+                        foreach (var clients in _clients.ToList())
                         {
+                            if (!clients.Connected)
+                            {
+                                Log("Client non connesso");
+                                DisconnectClient(clients);
+                                continue;
+                            }
+
                             if (clients != client)
                             {
                                 NetworkStream streamClient = clients.GetStream();
@@ -359,18 +358,11 @@ namespace ChatTCP.Server
                         Log("Messaggio sconosciuto ricevuto dal client");
                         Log(maybeJsonString);
                     }
-
-                    receivedString = null;
                 }
 
                 // Torna ad ascoltare nuovi messaggi
                 Log("CALL: BeginReceive(); Pronto a ricevere");
                 stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), client);
-            }
-            catch (ObjectDisposedException)
-            {
-                Log("EVNT: OnDataReceived(); Errore ObjectDisposedException");
-                MessageBox.Show("ObjectDisposedException", "Server");
             }
             catch (SocketException se)
             {
@@ -394,19 +386,10 @@ namespace ChatTCP.Server
                     break;
                 case Stato.Listening:
                     SettingsGroupBox.Enabled = false;
-                    DatiTxGroupBox.Enabled = false;
-                    DatiRxGroupBox.Enabled = false;
-                    StartListeningButton.Enabled = false;
-                    StopListeningButton.Enabled = true;
-                    SendButton.Enabled = false;
-                    DisconnectButton.Enabled = false;
-                    break;
-                case Stato.Connesso:
-                    SettingsGroupBox.Enabled = false;
                     DatiTxGroupBox.Enabled = true;
                     DatiRxGroupBox.Enabled = true;
                     StartListeningButton.Enabled = false;
-                    StopListeningButton.Enabled = false;
+                    StopListeningButton.Enabled = true;
                     SendButton.Enabled = true;
                     DisconnectButton.Enabled = true;
                     break;
