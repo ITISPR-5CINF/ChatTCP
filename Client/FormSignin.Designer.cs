@@ -29,15 +29,16 @@
         private void InitializeComponent()
         {
             this.lblSignin = new System.Windows.Forms.Label();
-            this.lblNome = new System.Windows.Forms.Label();
-            this.lblCognome = new System.Windows.Forms.Label();
-            this.lblUsername = new System.Windows.Forms.Label();
-            this.lblPassword = new System.Windows.Forms.Label();
+            this.NomeLabel = new System.Windows.Forms.Label();
+            this.CognomeLabel = new System.Windows.Forms.Label();
+            this.UsernameLabel = new System.Windows.Forms.Label();
+            this.PasswordLabel = new System.Windows.Forms.Label();
             this.NomeTextBox = new System.Windows.Forms.TextBox();
             this.CognomeTextBox = new System.Windows.Forms.TextBox();
             this.UsernameTextBox = new System.Windows.Forms.TextBox();
             this.PasswordTextBox = new System.Windows.Forms.TextBox();
             this.SigninButton = new System.Windows.Forms.Button();
+            this.CancelButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblSignin
@@ -50,94 +51,106 @@
             this.lblSignin.TabIndex = 0;
             this.lblSignin.Text = "Sign-In";
             // 
-            // lblNome
+            // NomeLabel
             // 
-            this.lblNome.AutoSize = true;
-            this.lblNome.Location = new System.Drawing.Point(14, 62);
-            this.lblNome.Name = "lblNome";
-            this.lblNome.Size = new System.Drawing.Size(35, 13);
-            this.lblNome.TabIndex = 1;
-            this.lblNome.Text = "Nome";
+            this.NomeLabel.AutoSize = true;
+            this.NomeLabel.Location = new System.Drawing.Point(12, 62);
+            this.NomeLabel.Name = "NomeLabel";
+            this.NomeLabel.Size = new System.Drawing.Size(35, 13);
+            this.NomeLabel.TabIndex = 1;
+            this.NomeLabel.Text = "Nome";
             // 
-            // lblCognome
+            // CognomeLabel
             // 
-            this.lblCognome.AutoSize = true;
-            this.lblCognome.Location = new System.Drawing.Point(14, 97);
-            this.lblCognome.Name = "lblCognome";
-            this.lblCognome.Size = new System.Drawing.Size(52, 13);
-            this.lblCognome.TabIndex = 2;
-            this.lblCognome.Text = "Cognome";
+            this.CognomeLabel.AutoSize = true;
+            this.CognomeLabel.Location = new System.Drawing.Point(12, 88);
+            this.CognomeLabel.Name = "CognomeLabel";
+            this.CognomeLabel.Size = new System.Drawing.Size(52, 13);
+            this.CognomeLabel.TabIndex = 2;
+            this.CognomeLabel.Text = "Cognome";
             // 
-            // lblUsername
+            // UsernameLabel
             // 
-            this.lblUsername.AutoSize = true;
-            this.lblUsername.Location = new System.Drawing.Point(14, 132);
-            this.lblUsername.Name = "lblUsername";
-            this.lblUsername.Size = new System.Drawing.Size(55, 13);
-            this.lblUsername.TabIndex = 3;
-            this.lblUsername.Text = "Username";
+            this.UsernameLabel.AutoSize = true;
+            this.UsernameLabel.Location = new System.Drawing.Point(12, 114);
+            this.UsernameLabel.Name = "UsernameLabel";
+            this.UsernameLabel.Size = new System.Drawing.Size(55, 13);
+            this.UsernameLabel.TabIndex = 3;
+            this.UsernameLabel.Text = "Username";
             // 
-            // lblPassword
+            // PasswordLabel
             // 
-            this.lblPassword.AutoSize = true;
-            this.lblPassword.Location = new System.Drawing.Point(14, 166);
-            this.lblPassword.Name = "lblPassword";
-            this.lblPassword.Size = new System.Drawing.Size(53, 13);
-            this.lblPassword.TabIndex = 4;
-            this.lblPassword.Text = "Password";
+            this.PasswordLabel.AutoSize = true;
+            this.PasswordLabel.Location = new System.Drawing.Point(12, 140);
+            this.PasswordLabel.Name = "PasswordLabel";
+            this.PasswordLabel.Size = new System.Drawing.Size(53, 13);
+            this.PasswordLabel.TabIndex = 4;
+            this.PasswordLabel.Text = "Password";
             // 
             // NomeTextBox
             // 
-            this.NomeTextBox.Location = new System.Drawing.Point(82, 59);
+            this.NomeTextBox.Location = new System.Drawing.Point(73, 59);
             this.NomeTextBox.Name = "NomeTextBox";
-            this.NomeTextBox.Size = new System.Drawing.Size(209, 20);
+            this.NomeTextBox.Size = new System.Drawing.Size(228, 20);
             this.NomeTextBox.TabIndex = 5;
             // 
             // CognomeTextBox
             // 
-            this.CognomeTextBox.Location = new System.Drawing.Point(82, 94);
+            this.CognomeTextBox.Location = new System.Drawing.Point(73, 85);
             this.CognomeTextBox.Name = "CognomeTextBox";
-            this.CognomeTextBox.Size = new System.Drawing.Size(209, 20);
+            this.CognomeTextBox.Size = new System.Drawing.Size(228, 20);
             this.CognomeTextBox.TabIndex = 6;
             // 
             // UsernameTextBox
             // 
-            this.UsernameTextBox.Location = new System.Drawing.Point(82, 129);
+            this.UsernameTextBox.Location = new System.Drawing.Point(73, 111);
             this.UsernameTextBox.Name = "UsernameTextBox";
-            this.UsernameTextBox.Size = new System.Drawing.Size(209, 20);
+            this.UsernameTextBox.Size = new System.Drawing.Size(228, 20);
             this.UsernameTextBox.TabIndex = 7;
             // 
             // PasswordTextBox
             // 
-            this.PasswordTextBox.Location = new System.Drawing.Point(82, 163);
+            this.PasswordTextBox.Location = new System.Drawing.Point(73, 137);
             this.PasswordTextBox.Name = "PasswordTextBox";
-            this.PasswordTextBox.Size = new System.Drawing.Size(209, 20);
+            this.PasswordTextBox.Size = new System.Drawing.Size(228, 20);
             this.PasswordTextBox.TabIndex = 8;
             // 
             // SigninButton
             // 
-            this.SigninButton.Location = new System.Drawing.Point(17, 203);
+            this.SigninButton.Location = new System.Drawing.Point(12, 175);
             this.SigninButton.Name = "SigninButton";
-            this.SigninButton.Size = new System.Drawing.Size(52, 29);
+            this.SigninButton.Size = new System.Drawing.Size(68, 23);
             this.SigninButton.TabIndex = 9;
             this.SigninButton.Text = "Sign-In";
             this.SigninButton.UseVisualStyleBackColor = true;
             this.SigninButton.Click += new System.EventHandler(this.SigninButton_Click);
             // 
+            // CancelButton
+            // 
+            this.CancelButton.Location = new System.Drawing.Point(226, 175);
+            this.CancelButton.Name = "CancelButton";
+            this.CancelButton.Size = new System.Drawing.Size(75, 23);
+            this.CancelButton.TabIndex = 10;
+            this.CancelButton.Text = "Annulla";
+            this.CancelButton.UseVisualStyleBackColor = true;
+            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
+            // 
             // FormSignin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(313, 238);
+            this.ClientSize = new System.Drawing.Size(313, 210);
+            this.ControlBox = false;
+            this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.SigninButton);
             this.Controls.Add(this.PasswordTextBox);
             this.Controls.Add(this.UsernameTextBox);
             this.Controls.Add(this.CognomeTextBox);
             this.Controls.Add(this.NomeTextBox);
-            this.Controls.Add(this.lblPassword);
-            this.Controls.Add(this.lblUsername);
-            this.Controls.Add(this.lblCognome);
-            this.Controls.Add(this.lblNome);
+            this.Controls.Add(this.PasswordLabel);
+            this.Controls.Add(this.UsernameLabel);
+            this.Controls.Add(this.CognomeLabel);
+            this.Controls.Add(this.NomeLabel);
             this.Controls.Add(this.lblSignin);
             this.Name = "FormSignin";
             this.Text = "Sign-In";
@@ -149,14 +162,15 @@
         #endregion
 
         private System.Windows.Forms.Label lblSignin;
-        private System.Windows.Forms.Label lblNome;
-        private System.Windows.Forms.Label lblCognome;
-        private System.Windows.Forms.Label lblUsername;
-        private System.Windows.Forms.Label lblPassword;
+        private System.Windows.Forms.Label NomeLabel;
+        private System.Windows.Forms.Label CognomeLabel;
+        private System.Windows.Forms.Label UsernameLabel;
+        private System.Windows.Forms.Label PasswordLabel;
         private System.Windows.Forms.TextBox NomeTextBox;
         private System.Windows.Forms.TextBox CognomeTextBox;
         private System.Windows.Forms.TextBox UsernameTextBox;
         private System.Windows.Forms.TextBox PasswordTextBox;
         private System.Windows.Forms.Button SigninButton;
+        private System.Windows.Forms.Button CancelButton;
     }
 }

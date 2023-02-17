@@ -47,14 +47,14 @@ namespace ChatTCP.Client
             // 
             // PasswordTextBox
             // 
-            this.PasswordTextBox.Location = new System.Drawing.Point(73, 95);
+            this.PasswordTextBox.Location = new System.Drawing.Point(73, 79);
             this.PasswordTextBox.Name = "PasswordTextBox";
             this.PasswordTextBox.Size = new System.Drawing.Size(207, 20);
             this.PasswordTextBox.TabIndex = 1;
             // 
             // LoginButton
             // 
-            this.LoginButton.Location = new System.Drawing.Point(12, 136);
+            this.LoginButton.Location = new System.Drawing.Point(12, 116);
             this.LoginButton.Name = "LoginButton";
             this.LoginButton.Size = new System.Drawing.Size(56, 27);
             this.LoginButton.TabIndex = 2;
@@ -84,7 +84,7 @@ namespace ChatTCP.Client
             // lblPassword
             // 
             this.lblPassword.AutoSize = true;
-            this.lblPassword.Location = new System.Drawing.Point(12, 98);
+            this.lblPassword.Location = new System.Drawing.Point(12, 82);
             this.lblPassword.Name = "lblPassword";
             this.lblPassword.Size = new System.Drawing.Size(53, 13);
             this.lblPassword.TabIndex = 5;
@@ -92,19 +92,20 @@ namespace ChatTCP.Client
             // 
             // buttonRegister
             // 
-            this.buttonRegister.Location = new System.Drawing.Point(12, 169);
+            this.buttonRegister.Location = new System.Drawing.Point(224, 116);
             this.buttonRegister.Name = "buttonRegister";
             this.buttonRegister.Size = new System.Drawing.Size(56, 27);
             this.buttonRegister.TabIndex = 6;
             this.buttonRegister.Text = "Register";
             this.buttonRegister.UseVisualStyleBackColor = true;
-            this.buttonRegister.Click += new System.EventHandler(this.buttonRegister_Click);
+            this.buttonRegister.Click += new System.EventHandler(this.RegisterButton_Click);
             // 
             // FormLogin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(292, 211);
+            this.ClientSize = new System.Drawing.Size(292, 155);
+            this.ControlBox = false;
             this.Controls.Add(this.buttonRegister);
             this.Controls.Add(this.lblPassword);
             this.Controls.Add(this.lblUsername);

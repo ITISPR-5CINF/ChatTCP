@@ -30,17 +30,22 @@ namespace ChatTCP.Client
             Close();
         }
 
-        private void buttonRegister_Click(object sender, EventArgs e)
+        private void RegisterButton_Click(object sender, EventArgs e)
         {
             FormSignin signin = new FormSignin();
             signin.ShowDialog();
+
+            if (!signin.Confirmed)
+            {
+                return;
+            }
 
             Nome = signin.Nome;
             Cognome= signin.Cognome;
             UsernameRegister = signin.Username;
             PasswordRegister = signin.Password;
 
-            isRegisteredInstruction= true;
+            isRegisteredInstruction = true;
 
             Close();
         }
