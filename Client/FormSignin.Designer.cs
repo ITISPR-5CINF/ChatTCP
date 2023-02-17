@@ -116,7 +116,7 @@
             // 
             // SigninButton
             // 
-            this.SigninButton.Location = new System.Drawing.Point(17, 218);
+            this.SigninButton.Location = new System.Drawing.Point(17, 203);
             this.SigninButton.Name = "SigninButton";
             this.SigninButton.Size = new System.Drawing.Size(52, 29);
             this.SigninButton.TabIndex = 9;
@@ -127,7 +127,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(345, 254);
+            this.ClientSize = new System.Drawing.Size(313, 238);
             this.Controls.Add(this.SigninButton);
             this.Controls.Add(this.PasswordTextBox);
             this.Controls.Add(this.UsernameTextBox);
