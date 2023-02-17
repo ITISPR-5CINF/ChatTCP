@@ -302,10 +302,22 @@ namespace ChatTCP.Server
                     if (message is Protocol.LoginMessage loginMessage)
                     {
                         // Fai il login
+                        ConnectionDB connection = new ConnectionDB();
+                        var loginResultMessage = connection.Login(loginMessage.username, loginMessage.password);
+
+                        // Invia il risultato
+                        var bytes = Protocol.EncodeMessage(loginResultMessage.ToJson());
+                        _sendStream.Write(bytes, 0, bytes.Length);
                     }
                     else if (message is Protocol.RegisterMessage registerMessage)
                     {
                         // Fai la registrazione
+                        ConnectionDB connection = new ConnectionDB();
+                        var loginResultMessage = connection.Register(registerMessage.nome, registerMessage.cognome, registerMessage.username, registerMessage.password);
+
+                        // Invia il risultato
+                        var bytes = Protocol.EncodeMessage(loginResultMessage.ToJson());
+                        _sendStream.Write(bytes, 0, bytes.Length);
                     }
                     else if (message is Protocol.SendMessageMessage sendMessageMessage)
                     {
