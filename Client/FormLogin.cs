@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChatTCP.Common;
+using System;
 using System.Windows.Forms;
 
 namespace ChatTCP.Client
@@ -22,6 +23,20 @@ namespace ChatTCP.Client
             }
 
             Close();
+        }
+
+        private void buttonRegister_Click(object sender, EventArgs e)
+        {
+            FormSignin signin = new FormSignin();
+            signin.ShowDialog();
+            /*
+            if (message is Protocol.RegisterMessage registerNewMessage)
+            {
+                var registerMessage = new Protocol.RegisterMessage
+                {
+                    nome = 
+                };
+            }*/
         }
     }
 }

@@ -35,6 +35,7 @@ namespace ChatTCP.Client
             this.lblAutenticazione = new System.Windows.Forms.Label();
             this.lblUsername = new System.Windows.Forms.Label();
             this.lblPassword = new System.Windows.Forms.Label();
+            this.buttonRegister = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // UsernameTextBox
@@ -89,11 +90,22 @@ namespace ChatTCP.Client
             this.lblPassword.TabIndex = 5;
             this.lblPassword.Text = "Password";
             // 
+            // buttonRegister
+            // 
+            this.buttonRegister.Location = new System.Drawing.Point(12, 169);
+            this.buttonRegister.Name = "buttonRegister";
+            this.buttonRegister.Size = new System.Drawing.Size(56, 27);
+            this.buttonRegister.TabIndex = 6;
+            this.buttonRegister.Text = "Register";
+            this.buttonRegister.UseVisualStyleBackColor = true;
+            this.buttonRegister.Click += new System.EventHandler(this.buttonRegister_Click);
+            // 
             // FormLogin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(292, 175);
+            this.ClientSize = new System.Drawing.Size(292, 211);
+            this.Controls.Add(this.buttonRegister);
             this.Controls.Add(this.lblPassword);
             this.Controls.Add(this.lblUsername);
             this.Controls.Add(this.lblAutenticazione);
@@ -115,5 +127,6 @@ namespace ChatTCP.Client
         private System.Windows.Forms.Label lblAutenticazione;
         private System.Windows.Forms.Label lblUsername;
         private System.Windows.Forms.Label lblPassword;
+        private System.Windows.Forms.Button buttonRegister;
     }
 }

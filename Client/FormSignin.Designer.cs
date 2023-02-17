@@ -122,6 +122,7 @@
             this.SigninButton.TabIndex = 9;
             this.SigninButton.Text = "Sign-In";
             this.SigninButton.UseVisualStyleBackColor = true;
+            this.SigninButton.Click += new System.EventHandler(this.SigninButton_Click);
             // 
             // FormSignin
             // 

@@ -16,5 +16,10 @@ namespace ChatTCP.Client
         {
             InitializeComponent();
         }
+
+        private void SigninButton_Click(object sender, EventArgs e)
+        {
+            
+        }
     }
 }
