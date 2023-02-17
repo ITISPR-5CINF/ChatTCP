@@ -158,6 +158,7 @@ namespace ChatTCP.Server
                     clients.GetStream().Write(messageBytes, 0, messageBytes.Length);
                 }
 
+                Log($"{messageReceivedMessage.username}: {messageReceivedMessage.message}");
             }
             catch (SocketException se)
             {
@@ -358,8 +359,9 @@ namespace ChatTCP.Server
                                 NetworkStream streamClient = clients.GetStream();
                                 streamClient.Write(bytes, 0, bytes.Length);
                             }
-
                         }
+
+                        Log($"{messageReceivedMessage.username}: {messageReceivedMessage.message}");
                     }
                     else
                     {
