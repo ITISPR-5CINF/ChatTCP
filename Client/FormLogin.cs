@@ -13,6 +13,7 @@ namespace ChatTCP.Client
         public string UsernameRegister = "";
         public string PasswordRegister = "";
         public bool isRegisteredInstruction = false;
+        public bool Cancelled = false;
 
         public FormLogin()
         {
@@ -41,11 +42,18 @@ namespace ChatTCP.Client
             }
 
             Nome = signin.Nome;
-            Cognome= signin.Cognome;
+            Cognome = signin.Cognome;
             UsernameRegister = signin.Username;
             PasswordRegister = signin.Password;
 
             isRegisteredInstruction = true;
+
+            Close();
+        }
+
+        private void CancelButton_Click(object sender, EventArgs e)
+        {
+            Cancelled = true;
 
             Close();
         }

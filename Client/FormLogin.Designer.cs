@@ -36,6 +36,7 @@ namespace ChatTCP.Client
             this.lblUsername = new System.Windows.Forms.Label();
             this.lblPassword = new System.Windows.Forms.Label();
             this.buttonRegister = new System.Windows.Forms.Button();
+            this.CancelButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // UsernameTextBox
@@ -54,9 +55,9 @@ namespace ChatTCP.Client
             // 
             // LoginButton
             // 
-            this.LoginButton.Location = new System.Drawing.Point(12, 116);
+            this.LoginButton.Location = new System.Drawing.Point(12, 120);
             this.LoginButton.Name = "LoginButton";
-            this.LoginButton.Size = new System.Drawing.Size(56, 27);
+            this.LoginButton.Size = new System.Drawing.Size(75, 23);
             this.LoginButton.TabIndex = 2;
             this.LoginButton.Text = "Login";
             this.LoginButton.UseVisualStyleBackColor = true;
@@ -92,13 +93,23 @@ namespace ChatTCP.Client
             // 
             // buttonRegister
             // 
-            this.buttonRegister.Location = new System.Drawing.Point(224, 116);
+            this.buttonRegister.Location = new System.Drawing.Point(93, 120);
             this.buttonRegister.Name = "buttonRegister";
-            this.buttonRegister.Size = new System.Drawing.Size(56, 27);
+            this.buttonRegister.Size = new System.Drawing.Size(75, 23);
             this.buttonRegister.TabIndex = 6;
             this.buttonRegister.Text = "Register";
             this.buttonRegister.UseVisualStyleBackColor = true;
             this.buttonRegister.Click += new System.EventHandler(this.RegisterButton_Click);
+            // 
+            // CancelButton
+            // 
+            this.CancelButton.Location = new System.Drawing.Point(205, 120);
+            this.CancelButton.Name = "CancelButton";
+            this.CancelButton.Size = new System.Drawing.Size(75, 23);
+            this.CancelButton.TabIndex = 7;
+            this.CancelButton.Text = "Annulla";
+            this.CancelButton.UseVisualStyleBackColor = true;
+            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
             // 
             // FormLogin
             // 
@@ -106,6 +117,7 @@ namespace ChatTCP.Client
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(292, 155);
             this.ControlBox = false;
+            this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.buttonRegister);
             this.Controls.Add(this.lblPassword);
             this.Controls.Add(this.lblUsername);
@@ -129,5 +141,6 @@ namespace ChatTCP.Client
         private System.Windows.Forms.Label lblUsername;
         private System.Windows.Forms.Label lblPassword;
         private System.Windows.Forms.Button buttonRegister;
+        private System.Windows.Forms.Button CancelButton;
     }
 }

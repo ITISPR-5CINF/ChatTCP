@@ -278,40 +278,10 @@ namespace ChatTCP.Client
                     if (message is Protocol.LoginNeededMessage loginNeededMessage)
                     {
                         // Apri il form
-                        var formLogin = new FormLogin();
-                        formLogin.ShowDialog();
-
-                        if (!formLogin.isRegisteredInstruction)
+                        if (!OpenLoginForm())
                         {
-                            var username = formLogin.Username;
-                            var password = formLogin.Password;
-
-                            var loginMessage = new Protocol.LoginMessage
-                            {
-                                username = username,
-                                password = password
-                            };
-
-                            var messageBytes = Protocol.EncodeMessage(loginMessage.ToJson());
-                            _stream.Write(messageBytes, 0, messageBytes.Length);
-                        }
-                        else
-                        {
-                            var username = formLogin.UsernameRegister;
-                            var password = formLogin.PasswordRegister;
-                            var nome = formLogin.Nome;
-                            var cognome = formLogin.Cognome;
-
-                            var registerMessage = new Protocol.RegisterMessage
-                            {
-                                username = username,
-                                password = password,
-                                nome = nome,
-                                cognome = cognome
-                            };
-
-                            var messageBytes = Protocol.EncodeMessage(registerMessage.ToJson());
-                            _stream.Write(messageBytes, 0, messageBytes.Length);
+                            // Chiudi la connessione
+                            CloseButton_Click(null, null);
                         }
                     }
                     else if (message is Protocol.LoginResultMessage loginResultMessage)
@@ -320,20 +290,11 @@ namespace ChatTCP.Client
                         if (loginResultMessage.result != Protocol.LoginResultMessage.Result.Success)
                         {
                             // Riapri il form
-                            var formLogin = new FormLogin();
-                            formLogin.ShowDialog();
-
-                            var username = formLogin.Username;
-                            var password = formLogin.Password;
-
-                            var loginMessage = new Protocol.LoginMessage
+                            if (!OpenLoginForm())
                             {
-                                username = username,
-                                password = password
-                            };
-
-                            var messageBytes = Protocol.EncodeMessage(loginMessage.ToJson());
-                            _stream.Write(messageBytes, 0, messageBytes.Length);
+                                // Chiudi la connessione
+                                CloseButton_Click(null, null);
+                            }
                         }
                     }
                     else if (message is Protocol.MessageReceivedMessage messageReceivedMessage)
@@ -364,6 +325,57 @@ namespace ChatTCP.Client
                 Log("EVNT: OnDataReceived(); Errore " + se.Message);
                 MessageBox.Show(se.Message, "Client");
             }
+        }
+
+        /// <summary>
+        /// Apre il form per il login
+        /// </summary>
+        /// <returns>false se il login è stato annullato, true altrimenti</returns>
+        private bool OpenLoginForm()
+        {
+            // Apri il form
+            var formLogin = new FormLogin();
+            formLogin.ShowDialog();
+
+            if (formLogin.Cancelled)
+            {
+                return false;
+            }
+
+            if (!formLogin.isRegisteredInstruction)
+            {
+                var username = formLogin.Username;
+                var password = formLogin.Password;
+
+                var loginMessage = new Protocol.LoginMessage
+                {
+                    username = username,
+                    password = password
+                };
+
+                var messageBytes = Protocol.EncodeMessage(loginMessage.ToJson());
+                _stream.Write(messageBytes, 0, messageBytes.Length);
+            }
+            else
+            {
+                var username = formLogin.UsernameRegister;
+                var password = formLogin.PasswordRegister;
+                var nome = formLogin.Nome;
+                var cognome = formLogin.Cognome;
+
+                var registerMessage = new Protocol.RegisterMessage
+                {
+                    username = username,
+                    password = password,
+                    nome = nome,
+                    cognome = cognome
+                };
+
+                var messageBytes = Protocol.EncodeMessage(registerMessage.ToJson());
+                _stream.Write(messageBytes, 0, messageBytes.Length);
+            }
+
+            return true;
         }
 
         private void AggiornaLayout()
