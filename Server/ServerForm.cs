@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 using ChatTCP.Common;
 
@@ -27,8 +28,7 @@ namespace ChatTCP.Server
         private string receivedString = null;
 
         public TcpListener _listener;
-        public TcpClient _sendSocket;
-        public NetworkStream _sendStream;
+        private List<TcpClient> _clients = new List<TcpClient>();
 
         public ServerForm()
         {
@@ -134,21 +134,26 @@ namespace ChatTCP.Server
             {
                 string message = DatiTxTextBox.Text;
                 byte[] messageBytes = System.Text.Encoding.ASCII.GetBytes(message);
-                
-                if (_sendSocket == null)
+
+                foreach (var clients in _clients)
                 {
-                    MessageBox.Show("Socket di invio nullo", "Server");
-                    return;
+                    if (clients == null)
+                    {
+                        MessageBox.Show("Socket di invio nullo", "Server");
+                        return;
+                    }
+
+                    if (!clients.Connected)
+                    {
+                        MessageBox.Show("Client non connesso", "Server");
+                        return;
+                    }
+
+                    Log("CALL: Send();");
+                    clients.GetStream().Write(messageBytes, 0, messageBytes.Length);
+
                 }
 
-                if (!_sendSocket.Connected)
-                {
-                    MessageBox.Show("Client non connesso", "Server");
-                    return;
-                }
-
-                Log("CALL: Send();");
-                _sendStream.Write(messageBytes, 0, messageBytes.Length);
             }
             catch (SocketException se)
             {
@@ -158,17 +163,17 @@ namespace ChatTCP.Server
 
         private void DisconnectButton_Click(object sender, EventArgs e)
         {
-            if (_sendSocket == null)
-            {
-                MessageBox.Show("Socket di invio nullo", "Server");
-                return;
-            }
+            //if (_sendSocket == null)
+            //{
+            //    MessageBox.Show("Socket di invio nullo", "Server");
+            //    return;
+            //}
 
-            if (!_sendSocket.Connected)
-            {
-                MessageBox.Show("Client non connesso", "Server");
-                return;
-            }
+            //if (!_sendSocket.Connected)
+            //{
+            //    MessageBox.Show("Client non connesso", "Server");
+            //    return;
+            //}
 
             DisconnectClients();
         }
@@ -177,13 +182,20 @@ namespace ChatTCP.Server
         {
             Log("CALL: DisconnectClients(); Richiesta disconnessione");
 
-            _sendStream?.Close();
-            _sendStream?.Dispose();
-            _sendStream = null;
+            foreach (TcpClient client in _clients)
+            {
+                if (client == null)
+                {
+                    continue;
+                }
 
-            _sendSocket?.Close();
-            _sendSocket?.Dispose();
-            _sendSocket = null;
+                var stream = client.GetStream();
+                stream?.Close();
+                stream?.Dispose();
+
+                client?.Close();
+                client?.Dispose();
+            }
 
             // Aggiorna lo stato e la UI
             _stato = Stato.Listening;
@@ -208,12 +220,14 @@ namespace ChatTCP.Server
 
             try
             {
-                _sendSocket = _listener.EndAcceptTcpClient(asyn);
+                var client = _listener.EndAcceptTcpClient(asyn);
                 Log("EVNT: BeginAccept(); Connessione accettata");
 
+                _clients.Add(client);
+
                 Log("CALL: BeginReceive(); Pronto a ricevere");
-                _sendStream = _sendSocket.GetStream();
-                _sendStream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _sendStream);
+                var stream = client.GetStream();
+                stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), client);
 
                 // Aggiorna lo stato e la UI
                 _stato = Stato.Connesso;
@@ -227,7 +241,7 @@ namespace ChatTCP.Server
                 var loginNeededMessage = new Protocol.LoginNeededMessage();
                 byte[] text = Protocol.EncodeMessage(loginNeededMessage.ToJson());
                 Log("Inviando richiesta di login al client");
-                _sendStream.Write(text, 0, text.Length);
+                stream.Write(text, 0, text.Length);
             }
             catch (ObjectDisposedException)
             {
@@ -253,7 +267,9 @@ namespace ChatTCP.Server
 
             try
             {
-                if (_sendSocket == null || !_sendSocket.Connected)
+                var client = (TcpClient)asyn.AsyncState;
+
+                if (client == null || !client.Connected)
                 {
                     Log("EVNT: OnDataReceived(); Disconnesso dal Server");
 
@@ -264,14 +280,16 @@ namespace ChatTCP.Server
                     return;
                 }
 
-                int numReceivedBytes = _sendStream.EndRead(asyn);
+                var stream = client.GetStream();
+
+                int numReceivedBytes = stream.EndRead(asyn);
 
                 if (numReceivedBytes == 0)
                 {
                     Log("EVNT: OnDataReceived(); Disconnesso dal Client");
                     Log("CALL: Close();");
-                    _sendSocket.Close();
-                    _sendSocket = null;
+                    client.Close();
+                    client = null;
 
                     // Aggiorna lo stato e la UI
                     _stato = Stato.Listening;
@@ -307,7 +325,7 @@ namespace ChatTCP.Server
 
                         // Invia il risultato
                         var bytes = Protocol.EncodeMessage(loginResultMessage.ToJson());
-                        _sendStream.Write(bytes, 0, bytes.Length);
+                        stream.Write(bytes, 0, bytes.Length);
                     }
                     else if (message is Protocol.RegisterMessage registerMessage)
                     {
@@ -317,11 +335,22 @@ namespace ChatTCP.Server
 
                         // Invia il risultato
                         var bytes = Protocol.EncodeMessage(loginResultMessage.ToJson());
-                        _sendStream.Write(bytes, 0, bytes.Length);
+                        stream.Write(bytes, 0, bytes.Length);
                     }
                     else if (message is Protocol.SendMessageMessage sendMessageMessage)
                     {
                         // Gestisci il messaggio
+                        byte[] bytes = Protocol.EncodeMessage(sendMessageMessage.ToJson());
+
+                        foreach (var clients in _clients)
+                        {
+                            if (clients != client)
+                            {
+                                NetworkStream streamClient = clients.GetStream();
+                                streamClient.Write(bytes, 0, bytes.Length);
+                            }
+
+                        }
                     }
                     else
                     {
@@ -334,7 +363,7 @@ namespace ChatTCP.Server
 
                 // Torna ad ascoltare nuovi messaggi
                 Log("CALL: BeginReceive(); Pronto a ricevere");
-                _sendStream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _sendSocket);
+                stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), client);
             }
             catch (ObjectDisposedException)
             {
