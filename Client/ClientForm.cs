@@ -156,6 +156,9 @@ namespace ChatTCP.Client
             {
                 MessageBox.Show(se.Message, "Client");
             }
+
+            // Ripulisi la textbox
+            SendTextBox.Text = "";
         }
 
         private delegate void del_OnConnect(IAsyncResult asyn);
