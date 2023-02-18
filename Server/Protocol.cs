@@ -54,7 +54,7 @@ namespace ChatTCP.Common
         /// </summary>
         public class RegisterMessage : BaseMessage
         {
-            override public string action => "login";
+            override public string action => "register";
 
             public string username { get; set; }
             public string password { get; set; }
