@@ -1,4 +1,4 @@
-﻿
+
 namespace ChatTCP.Client
 {
     partial class FormLogin
@@ -50,6 +50,7 @@ namespace ChatTCP.Client
             // 
             this.PasswordTextBox.Location = new System.Drawing.Point(73, 79);
             this.PasswordTextBox.Name = "PasswordTextBox";
+            this.PasswordTextBox.PasswordChar = '*';
             this.PasswordTextBox.Size = new System.Drawing.Size(207, 20);
             this.PasswordTextBox.TabIndex = 1;
             // 

@@ -1,4 +1,4 @@
-﻿namespace ChatTCP.Client
+namespace ChatTCP.Client
 {
     partial class FormSignin
     {
@@ -112,6 +112,7 @@
             // 
             this.PasswordTextBox.Location = new System.Drawing.Point(73, 137);
             this.PasswordTextBox.Name = "PasswordTextBox";
+            this.PasswordTextBox.PasswordChar = '*';
             this.PasswordTextBox.Size = new System.Drawing.Size(228, 20);
             this.PasswordTextBox.TabIndex = 8;
             // 
