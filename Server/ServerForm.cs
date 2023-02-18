@@ -29,6 +29,7 @@ namespace ChatTCP.Server
 
         private TcpListener _listener;
         private readonly List<TcpClient> _clients = new List<TcpClient>();
+        private readonly Dictionary<TcpClient, String> _clientToUsername = new Dictionary<TcpClient, string>();
 
         public ServerForm()
         {
@@ -142,6 +143,7 @@ namespace ChatTCP.Server
             }
 
             // Rimuovi l'oggetto dalla lista prima di distruggerlo
+            _clientToUsername.Remove(client);
             _clients.Remove(client);
 
             // Prova a distruggere l'oggetto
@@ -178,6 +180,7 @@ namespace ChatTCP.Server
             }
 
             // Svuota la lista di client
+            _clientToUsername.Clear();
             _clients.Clear();
         }
 
@@ -311,6 +314,11 @@ namespace ChatTCP.Server
                         ConnectionDB connection = new ConnectionDB();
                         var loginResultMessage = connection.Login(loginMessage.username, loginMessage.password);
 
+                        if (loginResultMessage.result == Protocol.LoginResultMessage.Result.Success)
+                        {
+                            _clientToUsername[client] = loginMessage.username;
+                        }
+
                         // Invia il risultato
                         var bytes = Protocol.EncodeMessage(loginResultMessage.ToJson());
                         stream.Write(bytes, 0, bytes.Length);
@@ -321,6 +329,11 @@ namespace ChatTCP.Server
                         ConnectionDB connection = new ConnectionDB();
                         var loginResultMessage = connection.Register(registerMessage.nome, registerMessage.cognome, registerMessage.username, registerMessage.password);
 
+                        if (loginResultMessage.result == Protocol.LoginResultMessage.Result.Success)
+                        {
+                            _clientToUsername[client] = registerMessage.username;
+                        }
+
                         // Invia il risultato
                         var bytes = Protocol.EncodeMessage(loginResultMessage.ToJson());
                         stream.Write(bytes, 0, bytes.Length);
@@ -328,30 +341,35 @@ namespace ChatTCP.Server
                     else if (message is Protocol.SendMessageMessage sendMessageMessage)
                     {
                         // Invia il messaggio agli altri client
-                        var messageReceivedMessage = new Protocol.MessageReceivedMessage
-                        {
-                            username = "TBD",
-                            message = sendMessageMessage.message
-                        };
-                        byte[] bytes = Protocol.EncodeMessage(messageReceivedMessage.ToJson());
+                        _clientToUsername.TryGetValue(client, out string username);
 
-                        foreach (var clients in _clients.ToList())
+                        if (username != null)
                         {
-                            if (!clients.Connected)
+                            var messageReceivedMessage = new Protocol.MessageReceivedMessage
                             {
-                                Log("Client non connesso");
-                                DisconnectClient(clients);
-                                continue;
+                                username = username,
+                                message = sendMessageMessage.message
+                            };
+                            byte[] bytes = Protocol.EncodeMessage(messageReceivedMessage.ToJson());
+
+                            foreach (var clients in _clients.ToList())
+                            {
+                                if (!clients.Connected)
+                                {
+                                    Log("Client non connesso");
+                                    DisconnectClient(clients);
+                                    continue;
+                                }
+
+                                if (clients != client)
+                                {
+                                    NetworkStream streamClient = clients.GetStream();
+                                    streamClient.Write(bytes, 0, bytes.Length);
+                                }
                             }
 
-                            if (clients != client)
-                            {
-                                NetworkStream streamClient = clients.GetStream();
-                                streamClient.Write(bytes, 0, bytes.Length);
-                            }
+                            Log($"{messageReceivedMessage.username}: {messageReceivedMessage.message}");
                         }
-
-                        Log($"{messageReceivedMessage.username}: {messageReceivedMessage.message}");
                     }
                     else
                     {
