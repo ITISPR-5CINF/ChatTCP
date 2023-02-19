@@ -1,12 +1,14 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Data;
 using ChatTCP.Common;
+using System.Configuration;
 
 namespace ChatTCP.Server
 {
     class ConnectionDB
     {
-        private readonly MySqlConnection conn = new MySqlConnection("Server=localhost;Database=chat_tcp;Uid=root;Pwd=''");
+        private static string configConn = ConfigurationManager.ConnectionStrings["MySQL"].ConnectionString;
+        private readonly MySqlConnection conn = new MySqlConnection(configConn);
 
         public Protocol.LoginResultMessage Login(string username, string password)
         {
