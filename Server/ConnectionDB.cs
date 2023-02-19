@@ -14,11 +14,15 @@ namespace ChatTCP.Server
 
             string cmdText = "SELECT *" +
                 " FROM utenti " +
-                " WHERE utenti.username = '" + username + "' AND utenti.password = '" + password + "';";
+                " WHERE utenti.username = @username AND utenti.password = @password;";
 
             conn.Open();
 
             MySqlCommand command = new MySqlCommand(cmdText, conn);
+            command.Parameters.Add("@username", MySqlDbType.VarChar);
+            command.Parameters.Add("@password", MySqlDbType.VarChar);
+            command.Parameters["@username"].Value = username;
+            command.Parameters["@password"].Value = password;
             DataTable users = new DataTable();
             users.Load(command.ExecuteReader());
 
@@ -55,11 +59,20 @@ namespace ChatTCP.Server
             }
 
             string cmdText = "INSERT INTO utenti (nome, cognome, username, password)" +
-                " VALUES ('" + nome + "','" + cognome + "','" + username + "','" + password + "');";
+                " VALUES (@nome, @cognome, @username, @password);";
 
             conn.Open();
 
             MySqlCommand command = new MySqlCommand(cmdText, conn);
+            command.Parameters.Add("@nome", MySqlDbType.VarChar);
+            command.Parameters.Add("@cognome", MySqlDbType.VarChar);
+            command.Parameters.Add("@username", MySqlDbType.VarChar);
+            command.Parameters.Add("@password", MySqlDbType.VarChar);
+            command.Parameters["@nome"].Value = nome;
+            command.Parameters["@cognome"].Value = cognome;
+            command.Parameters["@username"].Value = username;
+            command.Parameters["@password"].Value = password;
+
             command.ExecuteNonQuery();
 
             conn.Close();
@@ -73,11 +86,14 @@ namespace ChatTCP.Server
         {
             string cmdText = "SELECT utenti.username" +
                 " FROM utenti" +
-                " WHERE utenti.username = '" + username + "';";
+                " WHERE utenti.username = @username";
 
             conn.Open();
 
             MySqlCommand command = new MySqlCommand(cmdText, conn);
+            command.Parameters.Add("@username", MySqlDbType.VarChar);
+            command.Parameters["@username"].Value = username;
+
             DataTable users = new DataTable();
             users.Load(command.ExecuteReader());
 
