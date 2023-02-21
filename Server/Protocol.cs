@@ -21,19 +21,6 @@ namespace ChatTCP.Common
         }
 
         /// <summary>
-        /// Messaggio che rappresenta una richiesta di login del server verso un client
-        /// </summary>
-        public class LoginNeededMessage : BaseMessage
-        {
-            override public string action => "login_needed";
-
-            override public string ToJson()
-            {
-                return JsonSerializer.Serialize(this);
-            }
-        }
-
-        /// <summary>
         /// Messaggio che rappresenta un tentativo di login da parte di un client
         /// </summary>
         public class LoginMessage : BaseMessage
@@ -138,8 +125,6 @@ namespace ChatTCP.Common
 
                 switch (baseMessage.action)
                 {
-                    case "login_needed":
-                        return JsonSerializer.Deserialize<LoginNeededMessage>(json);
                     case "login":
                         return JsonSerializer.Deserialize<LoginMessage>(json);
                     case "register":

@@ -194,6 +194,15 @@ namespace ChatTCP.Client
             Log("EVNT: OnConnect(); Connessione accettata");
             Log("CALL: BeginReceive(); Pronto a ricevere");
             _stream = _clientSocket.GetStream();
+
+            // Apri il form
+            if (!OpenLoginForm())
+            {
+                // Chiudi la connessione
+                CloseConnection();
+            }
+
+            // Torna a ricevere nuovi dati
             _stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _stream);
 
             // Aggiorna lo stato e la UI
@@ -249,16 +258,7 @@ namespace ChatTCP.Client
 
                     Protocol.BaseMessage message = Protocol.FromJson(maybeJsonString);
 
-                    if (message is Protocol.LoginNeededMessage loginNeededMessage)
-                    {
-                        // Apri il form
-                        if (!OpenLoginForm())
-                        {
-                            // Chiudi la connessione
-                            CloseConnection();
-                        }
-                    }
-                    else if (message is Protocol.LoginResultMessage loginResultMessage)
+                    if (message is Protocol.LoginResultMessage loginResultMessage)
                     {
                         // Controlla se siamo loggati
                         if (loginResultMessage.result != Protocol.LoginResultMessage.Result.Success)

@@ -230,12 +230,6 @@ namespace ChatTCP.Server
                 var stream = client.GetStream();
                 stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), client);
 
-                // Invia richiesta di login
-                var loginNeededMessage = new Protocol.LoginNeededMessage();
-                byte[] text = Protocol.EncodeMessage(loginNeededMessage.ToJson());
-                Log("Inviando richiesta di login al client");
-                stream.Write(text, 0, text.Length);
-
                 // Torna ad ascoltare nuove richieste di connessione
                 Log(".........................");
                 Log("CALL: BeginAccept(); BeginAccept REimpostata");
