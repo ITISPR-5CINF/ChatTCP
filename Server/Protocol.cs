@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -177,19 +178,30 @@ namespace ChatTCP.Common
             return Encoding.UTF8.GetString(bytes, 0, numBytes);
         }
 
-        public static string GetMessageOrNull(string s)
+        /// <summary>
+        /// Elabora i dati ricevuti dal socket e separa i pacchetti dove serve
+        /// </summary>
+        /// <param name="buffer">Il buffer dove vengono salvati i dati non processati</param>
+        /// <returns>Lista di messaggi pronti per essere deserializzati dal JSON parser, vuoto se il pacchetto non è completo</returns>
+        public static List<string> GetMessages(ref string buffer)
         {
-            if (string.IsNullOrEmpty(s))
+            var messagesList = new List<string>();
+
+            if (string.IsNullOrEmpty(buffer))
             {
-                return null;
+                return messagesList;
             }
 
-            if (s.Substring(s.Length - 1) != "\0")
+            // Continuiamo a processare la stringa fino a che non rimangono caratteri NUL
+            int nullCharIndex;
+            while ((nullCharIndex = buffer.IndexOf('\0')) != -1)
             {
-                return null;
+                var message = buffer.Substring(0, nullCharIndex);
+                messagesList.Add(message);
+                buffer = buffer.Substring(nullCharIndex + 1);
             }
 
-            return s.Substring(0, s.Length - 1);
+            return messagesList;
         }
     }
 }

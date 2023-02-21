@@ -23,7 +23,7 @@ namespace ChatTCP.Server
         private const int DIMBUFF = 5;
 
         private readonly byte[] receivedBytesBuffer = new byte[DIMBUFF];
-        private string receivedString = null;
+        private string receivedString = "";
 
         private TcpListener _listener;
         private readonly List<TcpClient> _clients = new List<TcpClient>();
@@ -284,21 +284,12 @@ namespace ChatTCP.Server
                 string szData = Protocol.DecodeMessage(receivedBytesBuffer, numReceivedBytes);
                 DatiRxTextBox.Text += szData;
 
-                if (receivedString == null)
-                {
-                    receivedString = szData;
-                }
-                else
-                {
-                    receivedString += szData;
-                }
-                string maybeJsonString = Protocol.GetMessageOrNull(receivedString);
-                if (maybeJsonString != null)
-                {
-                    // Resetta il buffer della stringa ricevuta
-                    receivedString = null;
+                receivedString += szData;
 
-                    Protocol.BaseMessage message = Protocol.FromJson(maybeJsonString);
+                var messages = Protocol.GetMessages(ref receivedString);
+                foreach (var messageText in messages)
+                {
+                    Protocol.BaseMessage message = Protocol.FromJson(messageText);
 
                     if (message is Protocol.LoginMessage loginMessage)
                     {
@@ -366,7 +357,7 @@ namespace ChatTCP.Server
                     else
                     {
                         Log("Messaggio sconosciuto ricevuto dal client");
-                        Log(maybeJsonString);
+                        Log(messageText);
                     }
                 }
 
