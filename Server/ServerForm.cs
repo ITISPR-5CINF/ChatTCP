@@ -20,8 +20,6 @@ namespace ChatTCP.Server
         }
         private Stato _stato;
 
-        private const int DEFAULT_PORT = 8221;
-
         private const int DIMBUFF = 5;
 
         private readonly byte[] receivedBytesBuffer = new byte[DIMBUFF];
@@ -42,7 +40,7 @@ namespace ChatTCP.Server
             Text = WINDOWTITLE;
 
             // Imposta porta di default
-            PortaTcpTextBox.Text = Convert.ToString(DEFAULT_PORT);
+            PortaTcpTextBox.Text = Convert.ToString(Protocol.DEFAULT_PORT);
 
             // Imposta lo stato iniziale
             _stato = Stato.Iniziale;

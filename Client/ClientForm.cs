@@ -18,8 +18,6 @@ namespace ChatTCP.Client
         }
         private Stato _stato;
 
-        private const int DEFAULT_PORT = 8221;
-
         private const int DIMBUFF = 5;
 
         private readonly byte[] receivedBytesBuffer = new byte[DIMBUFF];
@@ -36,7 +34,7 @@ namespace ChatTCP.Client
         private void ClientForm_Load(object sender, EventArgs e)
         {
             // Imposta porta di default
-            PortaTcpTextBox.Text = Convert.ToString(DEFAULT_PORT);
+            PortaTcpTextBox.Text = Convert.ToString(Protocol.DEFAULT_PORT);
 
             // Ricavo tutti i nomi dei pc in rete
             List<string> NetComputers = BroadcastDomainUtils.GetNetComputers();

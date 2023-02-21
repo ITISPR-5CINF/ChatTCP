@@ -8,6 +8,11 @@ namespace ChatTCP.Common
     public static class Protocol
     {
         /// <summary>
+        /// Porta di default del protocollo
+        /// </summary>
+        public const int DEFAULT_PORT = 8221;
+
+        /// <summary>
         /// Classe di base che rappresenta un messaggio
         /// </summary>
         public class BaseMessage
