@@ -26,6 +26,8 @@ namespace ChatTCP.Client
         private TcpClient _clientSocket;
         private NetworkStream _stream;
 
+        private string _username;
+
         public ClientForm()
         {
             InitializeComponent();
@@ -121,6 +123,16 @@ namespace ChatTCP.Client
             CloseConnection();
         }
 
+        private void UserInfoButton_Click(object sender, EventArgs e)
+        {
+            var form = new FormUserInfo(_username, "", "")
+            {
+                OnUpdateUserInfoCallback = OnUpdateUserInfo,
+                OnChangePasswordCallback = OnChangePassword
+            };
+            form.ShowDialog();
+        }
+
         private void SendButton_Click(object sender, EventArgs e)
         {
             try
@@ -148,7 +160,7 @@ namespace ChatTCP.Client
                 var message = Protocol.EncodeMessage(sendMessageMessage.ToJson());
                 _stream.Write(message, 0, message.Length);
 
-                AddMessageToUI("Io", sendMessageMessage.message);
+                AddMessageToUI(_username, sendMessageMessage.message);
             }
             catch (SocketException se)
             {
@@ -252,12 +264,18 @@ namespace ChatTCP.Client
                         // Controlla se siamo loggati
                         if (loginResultMessage.result != Protocol.LoginResultMessage.Result.Success)
                         {
+                            _username = null;
+
                             // Riapri il form
                             if (!OpenLoginForm())
                             {
                                 // Chiudi la connessione
                                 CloseConnection();
                             }
+                        }
+                        else
+                        {
+                            UpdateUsername();
                         }
                     }
                     else if (message is Protocol.MessageReceivedMessage messageReceivedMessage)
@@ -303,6 +321,8 @@ namespace ChatTCP.Client
                 var username = formLogin.Username;
                 var password = formLogin.Password;
 
+                _username = username;
+
                 var loginMessage = new Protocol.LoginMessage
                 {
                     username = username,
@@ -318,6 +338,8 @@ namespace ChatTCP.Client
                 var password = formLogin.PasswordRegister;
                 var nome = formLogin.Nome;
                 var cognome = formLogin.Cognome;
+
+                _username = username;
 
                 var registerMessage = new Protocol.RegisterMessage
                 {
@@ -346,9 +368,45 @@ namespace ChatTCP.Client
             _clientSocket?.Close();
             _clientSocket = null;
 
+            // Pulisci lo username
+            _username = null;
+            UpdateUsername();
+
             // Aggiorna lo stato e la UI
             _stato = Stato.Disconnesso;
             AggiornaLayout();
+        }
+
+        private void UpdateUsername()
+        {
+            var usernameText = _username;
+            if (usernameText == null)
+            {
+                usernameText = "[Disconnesso]";
+            }
+
+            ConnectedAsLabel.Text = $"Connesso come: {usernameText}";
+        }
+
+        private void OnUpdateUserInfo(string nome, string cognome)
+        {
+            var updateUserInfoMessage = new Protocol.UpdateUserInfoMessage
+            {
+                nome = nome,
+                cognome = cognome
+            };
+            var bytes = Protocol.EncodeMessage(updateUserInfoMessage.ToJson());
+            _stream.Write(bytes, 0, bytes.Length);
+        }
+
+        private void OnChangePassword(string password)
+        {
+            var changePasswordMessage = new Protocol.ChangePasswordMessage
+            {
+                new_password = password
+            };
+            var bytes = Protocol.EncodeMessage(changePasswordMessage.ToJson());
+            _stream.Write(bytes, 0, bytes.Length);
         }
 
         private void AggiornaLayout()
@@ -361,6 +419,7 @@ namespace ChatTCP.Client
                     ConnectButton.Enabled = true;
                     CloseButton.Enabled = false;
                     SendButton.Enabled = false;
+                    UserInfoButton.Enabled = false;
                     break;
                 case Stato.Connessione:
                     ImpostazioniGroupBox.Enabled = false;
@@ -368,6 +427,7 @@ namespace ChatTCP.Client
                     ConnectButton.Enabled = false;
                     CloseButton.Enabled = false;
                     SendButton.Enabled = false;
+                    UserInfoButton.Enabled = false;
                     break;
                 case Stato.Connesso:
                     ImpostazioniGroupBox.Enabled = false;
@@ -375,6 +435,7 @@ namespace ChatTCP.Client
                     ConnectButton.Enabled = false;
                     CloseButton.Enabled = true;
                     SendButton.Enabled = true;
+                    UserInfoButton.Enabled = true;
                     break;
             }
         }

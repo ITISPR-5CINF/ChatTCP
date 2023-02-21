@@ -84,6 +84,50 @@ namespace ChatTCP.Server
             return loginMessage;
         }
 
+        public void UpdateUserInfo(string username, string nome, string cognome)
+        {
+            string cmdText = "UPDATE utenti" +
+                " SET nome = @nome, cognome = @cognome" +
+                " WHERE username = @username;";
+
+            conn.Open();
+
+            MySqlCommand command = new MySqlCommand(cmdText, conn);
+            command.Parameters.Add("@username", MySqlDbType.VarChar);
+            command.Parameters.Add("@nome", MySqlDbType.VarChar);
+            command.Parameters.Add("@cognome", MySqlDbType.VarChar);
+            command.Parameters["@username"].Value = username;
+            command.Parameters["@nome"].Value = nome;
+            command.Parameters["@cognome"].Value = cognome;
+
+            command.ExecuteNonQuery();
+
+            conn.Close();
+
+            return;
+        }
+
+        public void ChangePassword(string username, string newPassword)
+        {
+            string cmdText = "UPDATE utenti" +
+                " SET password = @newPassword" +
+                " WHERE username = @username;";
+
+            conn.Open();
+
+            MySqlCommand command = new MySqlCommand(cmdText, conn);
+            command.Parameters.Add("@username", MySqlDbType.VarChar);
+            command.Parameters.Add("@newPassword", MySqlDbType.VarChar);
+            command.Parameters["@username"].Value = username;
+            command.Parameters["@newPassword"].Value = newPassword;
+
+            command.ExecuteNonQuery();
+
+            conn.Close();
+
+            return;
+        }
+
         private bool UserAlreadyExists(string username)
         {
             string cmdText = "SELECT utenti.username" +

@@ -114,6 +114,37 @@ namespace ChatTCP.Common
         }
 
         /// <summary>
+        /// Aggiorna le informazioni sull'utente
+        /// </summary>
+        public class UpdateUserInfoMessage : BaseMessage
+        {
+            override public string action => "update_user_info";
+
+            public string nome { get; set; }
+            public string cognome { get; set; }
+
+            override public string ToJson()
+            {
+                return JsonSerializer.Serialize(this);
+            }
+        }
+
+        /// <summary>
+        /// Cambia la password di un utente
+        /// </summary>
+        public class ChangePasswordMessage : BaseMessage
+        {
+            override public string action => "change_password";
+
+            public string new_password { get; set; }
+
+            public override string ToJson()
+            {
+                return JsonSerializer.Serialize(this);
+            }
+        }
+
+        /// <summary>
         /// Converti una stringa JSON in oggetto
         /// </summary>
         /// <param name="json">Il messaggio ricevuto</param>
@@ -141,6 +172,10 @@ namespace ChatTCP.Common
                         return JsonSerializer.Deserialize<SendMessageMessage>(json);
                     case "message_received":
                         return JsonSerializer.Deserialize<MessageReceivedMessage>(json);
+                    case "update_user_info":
+                        return JsonSerializer.Deserialize<UpdateUserInfoMessage>(json);
+                    case "change_password":
+                        return JsonSerializer.Deserialize<ChangePasswordMessage>(json);
                     default:
                         // throw new Exception("Unknown action");
                         return null;

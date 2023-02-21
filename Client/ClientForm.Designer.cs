@@ -32,18 +32,22 @@
             this.NetworkComputersComboBox = new System.Windows.Forms.ComboBox();
             this.PortaTcpTextBox = new System.Windows.Forms.TextBox();
             this.PortaTcpLabel = new System.Windows.Forms.Label();
+            this.IpRemotoLabel = new System.Windows.Forms.Label();
             this.CloseButton = new System.Windows.Forms.Button();
             this.ConnectButton = new System.Windows.Forms.Button();
-            this.IpRemotoLabel = new System.Windows.Forms.Label();
             this.MessagesListBox = new System.Windows.Forms.ListBox();
             this.SendGroupBox = new System.Windows.Forms.GroupBox();
             this.SendButton = new System.Windows.Forms.Button();
             this.SendTextBox = new System.Windows.Forms.TextBox();
             this.LoggingGroupBox = new System.Windows.Forms.GroupBox();
             this.LoggingListBox = new System.Windows.Forms.ListBox();
+            this.ConnectedAsLabel = new System.Windows.Forms.Label();
+            this.UserInfoButton = new System.Windows.Forms.Button();
+            this.AccountGroupBox = new System.Windows.Forms.GroupBox();
             this.ImpostazioniGroupBox.SuspendLayout();
             this.SendGroupBox.SuspendLayout();
             this.LoggingGroupBox.SuspendLayout();
+            this.AccountGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // ImpostazioniGroupBox
@@ -83,6 +87,14 @@
             this.PortaTcpLabel.TabIndex = 2;
             this.PortaTcpLabel.Text = "Porta TCP:";
             // 
+            // IpRemotoLabel
+            // 
+            this.IpRemotoLabel.Location = new System.Drawing.Point(6, 16);
+            this.IpRemotoLabel.Name = "IpRemotoLabel";
+            this.IpRemotoLabel.Size = new System.Drawing.Size(60, 16);
+            this.IpRemotoLabel.TabIndex = 0;
+            this.IpRemotoLabel.Text = "IP Remoto:";
+            // 
             // CloseButton
             // 
             this.CloseButton.Enabled = false;
@@ -101,14 +113,6 @@
             this.ConnectButton.TabIndex = 4;
             this.ConnectButton.Text = "Connect";
             this.ConnectButton.Click += new System.EventHandler(this.ConnectButton_Click);
-            // 
-            // IpRemotoLabel
-            // 
-            this.IpRemotoLabel.Location = new System.Drawing.Point(6, 16);
-            this.IpRemotoLabel.Name = "IpRemotoLabel";
-            this.IpRemotoLabel.Size = new System.Drawing.Size(60, 16);
-            this.IpRemotoLabel.TabIndex = 0;
-            this.IpRemotoLabel.Text = "IP Remoto:";
             // 
             // MessagesListBox
             // 
@@ -152,9 +156,9 @@
             // LoggingGroupBox
             // 
             this.LoggingGroupBox.Controls.Add(this.LoggingListBox);
-            this.LoggingGroupBox.Location = new System.Drawing.Point(12, 141);
+            this.LoggingGroupBox.Location = new System.Drawing.Point(12, 210);
             this.LoggingGroupBox.Name = "LoggingGroupBox";
-            this.LoggingGroupBox.Size = new System.Drawing.Size(161, 271);
+            this.LoggingGroupBox.Size = new System.Drawing.Size(161, 202);
             this.LoggingGroupBox.TabIndex = 9;
             this.LoggingGroupBox.TabStop = false;
             this.LoggingGroupBox.Text = "Logging";
@@ -166,14 +170,45 @@
             this.LoggingListBox.ItemHeight = 14;
             this.LoggingListBox.Location = new System.Drawing.Point(6, 19);
             this.LoggingListBox.Name = "LoggingListBox";
-            this.LoggingListBox.Size = new System.Drawing.Size(149, 242);
+            this.LoggingListBox.Size = new System.Drawing.Size(149, 172);
             this.LoggingListBox.TabIndex = 0;
+            // 
+            // ConnectedAsLabel
+            // 
+            this.ConnectedAsLabel.AutoSize = true;
+            this.ConnectedAsLabel.Location = new System.Drawing.Point(6, 16);
+            this.ConnectedAsLabel.Name = "ConnectedAsLabel";
+            this.ConnectedAsLabel.Size = new System.Drawing.Size(86, 13);
+            this.ConnectedAsLabel.TabIndex = 10;
+            this.ConnectedAsLabel.Text = "Connesso come:";
+            // 
+            // UserInfoButton
+            // 
+            this.UserInfoButton.Location = new System.Drawing.Point(6, 34);
+            this.UserInfoButton.Name = "UserInfoButton";
+            this.UserInfoButton.Size = new System.Drawing.Size(149, 23);
+            this.UserInfoButton.TabIndex = 11;
+            this.UserInfoButton.Text = "Info utente";
+            this.UserInfoButton.UseVisualStyleBackColor = true;
+            this.UserInfoButton.Click += new System.EventHandler(this.UserInfoButton_Click);
+            // 
+            // AccountGroupBox
+            // 
+            this.AccountGroupBox.Controls.Add(this.UserInfoButton);
+            this.AccountGroupBox.Controls.Add(this.ConnectedAsLabel);
+            this.AccountGroupBox.Location = new System.Drawing.Point(12, 141);
+            this.AccountGroupBox.Name = "AccountGroupBox";
+            this.AccountGroupBox.Size = new System.Drawing.Size(161, 63);
+            this.AccountGroupBox.TabIndex = 13;
+            this.AccountGroupBox.TabStop = false;
+            this.AccountGroupBox.Text = "Account";
             // 
             // ClientForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(583, 423);
+            this.Controls.Add(this.AccountGroupBox);
             this.Controls.Add(this.LoggingGroupBox);
             this.Controls.Add(this.SendGroupBox);
             this.Controls.Add(this.CloseButton);
@@ -188,6 +223,8 @@
             this.SendGroupBox.ResumeLayout(false);
             this.SendGroupBox.PerformLayout();
             this.LoggingGroupBox.ResumeLayout(false);
+            this.AccountGroupBox.ResumeLayout(false);
+            this.AccountGroupBox.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -207,5 +244,8 @@
         private System.Windows.Forms.GroupBox LoggingGroupBox;
         private System.Windows.Forms.ComboBox NetworkComputersComboBox;
         private System.Windows.Forms.ListBox LoggingListBox;
+        private System.Windows.Forms.Label ConnectedAsLabel;
+        private System.Windows.Forms.Button UserInfoButton;
+        private System.Windows.Forms.GroupBox AccountGroupBox;
     }
 }

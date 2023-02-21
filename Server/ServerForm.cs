@@ -354,6 +354,34 @@ namespace ChatTCP.Server
                             Log($"{messageReceivedMessage.username}: {messageReceivedMessage.message}");
                         }
                     }
+                    else if (message is Protocol.UpdateUserInfoMessage updateUserInfoMessage)
+                    {
+                        // Aggiorna nome e cognome
+                        if (_clientToUsername.ContainsKey(client))
+                        {
+                            var username = _clientToUsername[client];
+                            ConnectionDB connection = new ConnectionDB();
+                            connection.UpdateUserInfo(username, updateUserInfoMessage.nome, updateUserInfoMessage.cognome);
+                        }
+                        else
+                        {
+                            Log("Un utente non loggato ha provato ad aggiornare i dati dell'account");
+                        }
+                    }
+                    else if (message is Protocol.ChangePasswordMessage changePasswordMessage)
+                    {
+                        // Aggiorna nome e cognome
+                        if (_clientToUsername.ContainsKey(client))
+                        {
+                            var username = _clientToUsername[client];
+                            ConnectionDB connection = new ConnectionDB();
+                            connection.ChangePassword(username, changePasswordMessage.new_password);
+                        }
+                        else
+                        {
+                            Log("Un utente non loggato ha provato a cambiare la password");
+                        }
+                    }
                     else
                     {
                         Log("Messaggio sconosciuto ricevuto dal client");
