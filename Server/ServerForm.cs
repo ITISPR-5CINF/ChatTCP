@@ -364,6 +364,18 @@ namespace ChatTCP.Server
                             Log("Un utente non loggato ha provato a cambiare la password");
                         }
                     }
+                    else if (message is Protocol.LogoutMessage logoutMessage)
+                    {
+                        // Rimuove l'associazione riferita all'utente che vuole svolgere il Logout dalla sessione
+                        if (_clientToUsername.ContainsKey(client))
+                        {
+                            _clientToUsername.Remove(client);
+                        }
+                        else
+                        {
+                            Log("Un utente non loggato ha provato a sloggarsi");
+                        }
+                    }
                     else
                     {
                         Log("Messaggio sconosciuto ricevuto dal client");

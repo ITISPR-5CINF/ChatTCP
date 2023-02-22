@@ -44,6 +44,7 @@
             this.ConnectedAsLabel = new System.Windows.Forms.Label();
             this.UserInfoButton = new System.Windows.Forms.Button();
             this.AccountGroupBox = new System.Windows.Forms.GroupBox();
+            this.LogoutButton = new System.Windows.Forms.Button();
             this.ImpostazioniGroupBox.SuspendLayout();
             this.SendGroupBox.SuspendLayout();
             this.LoggingGroupBox.SuspendLayout();
@@ -179,15 +180,15 @@
             this.ConnectedAsLabel.AutoSize = true;
             this.ConnectedAsLabel.Location = new System.Drawing.Point(6, 16);
             this.ConnectedAsLabel.Name = "ConnectedAsLabel";
-            this.ConnectedAsLabel.Size = new System.Drawing.Size(86, 13);
+            this.ConnectedAsLabel.Size = new System.Drawing.Size(65, 13);
             this.ConnectedAsLabel.TabIndex = 10;
-            this.ConnectedAsLabel.Text = "Connesso come:";
+            this.ConnectedAsLabel.Text = "Non loggato";
             // 
             // UserInfoButton
             // 
             this.UserInfoButton.Location = new System.Drawing.Point(6, 34);
             this.UserInfoButton.Name = "UserInfoButton";
-            this.UserInfoButton.Size = new System.Drawing.Size(149, 23);
+            this.UserInfoButton.Size = new System.Drawing.Size(77, 23);
             this.UserInfoButton.TabIndex = 11;
             this.UserInfoButton.Text = "Info utente";
             this.UserInfoButton.UseVisualStyleBackColor = true;
@@ -195,6 +196,7 @@
             // 
             // AccountGroupBox
             // 
+            this.AccountGroupBox.Controls.Add(this.LogoutButton);
             this.AccountGroupBox.Controls.Add(this.UserInfoButton);
             this.AccountGroupBox.Controls.Add(this.ConnectedAsLabel);
             this.AccountGroupBox.Location = new System.Drawing.Point(12, 141);
@@ -203,6 +205,16 @@
             this.AccountGroupBox.TabIndex = 13;
             this.AccountGroupBox.TabStop = false;
             this.AccountGroupBox.Text = "Account";
+            // 
+            // LogoutButton
+            // 
+            this.LogoutButton.Location = new System.Drawing.Point(89, 34);
+            this.LogoutButton.Name = "LogoutButton";
+            this.LogoutButton.Size = new System.Drawing.Size(66, 23);
+            this.LogoutButton.TabIndex = 12;
+            this.LogoutButton.Text = "Logout";
+            this.LogoutButton.UseVisualStyleBackColor = true;
+            this.LogoutButton.Click += new System.EventHandler(this.LogoutButton_Click);
             // 
             // ClientForm
             // 
@@ -248,5 +260,6 @@
         private System.Windows.Forms.Label ConnectedAsLabel;
         private System.Windows.Forms.Button UserInfoButton;
         private System.Windows.Forms.GroupBox AccountGroupBox;
+        private System.Windows.Forms.Button LogoutButton;
     }
 }

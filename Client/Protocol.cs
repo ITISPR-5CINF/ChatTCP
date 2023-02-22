@@ -146,6 +146,19 @@ namespace ChatTCP.Common
         }
 
         /// <summary>
+        /// Fa il logout di un utente senza interrompere la connessione
+        /// </summary>
+        public class LogoutMessage : BaseMessage
+        {
+            override public string action => "logout";
+
+            public override string ToJson()
+            {
+                return JsonSerializer.Serialize(this);
+            }
+        }
+
+        /// <summary>
         /// Converti una stringa JSON in oggetto
         /// </summary>
         /// <param name="json">Il messaggio ricevuto</param>
@@ -177,6 +190,8 @@ namespace ChatTCP.Common
                         return JsonSerializer.Deserialize<UpdateUserInfoMessage>(json);
                     case "change_password":
                         return JsonSerializer.Deserialize<ChangePasswordMessage>(json);
+                    case "logout":
+                        return JsonSerializer.Deserialize<LogoutMessage>(json);
                     default:
                         // throw new Exception("Unknown action");
                         return null;

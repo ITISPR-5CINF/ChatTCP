@@ -14,7 +14,8 @@ namespace ChatTCP.Client
         {
             Disconnesso,
             Connessione,
-            Connesso
+            Connesso,
+            Loggato,
         }
         private Stato _stato;
 
@@ -133,6 +134,29 @@ namespace ChatTCP.Client
             form.ShowDialog();
         }
 
+        private void LogoutButton_Click(object sender, EventArgs e)
+        {
+            // Richiedi al server di fare logout
+            var logoutMessage = new Protocol.LogoutMessage();
+
+            var bytes = Protocol.EncodeMessage(logoutMessage.ToJson());
+            _stream.Write(bytes, 0, bytes.Length);
+
+            // Rimuovi le informazioni del client connesso per liberare lo spazio in memoria per un altro
+            _username = null;
+            UpdateUsername();
+
+            // Aggiorna lo stato e la UI
+            _stato = Stato.Connesso;
+            AggiornaLayout();
+
+            // Riapri LoginForm
+            if (!OpenLoginForm())
+            {
+                CloseConnection();
+            }
+        }
+
         private void SendButton_Click(object sender, EventArgs e)
         {
             string messageText = SendTextBox.Text;
@@ -212,6 +236,10 @@ namespace ChatTCP.Client
             Log("CALL: BeginReceive(); Pronto a ricevere");
             _stream = _clientSocket.GetStream();
 
+            // Aggiorna lo stato e la UI
+            _stato = Stato.Connesso;
+            AggiornaLayout();
+
             // Apri il form
             if (!OpenLoginForm())
             {
@@ -221,10 +249,6 @@ namespace ChatTCP.Client
 
             // Torna a ricevere nuovi dati
             _stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _stream);
-
-            // Aggiorna lo stato e la UI
-            _stato = Stato.Connesso;
-            AggiornaLayout();
         }
 
         private delegate void del_OnDataReceived(IAsyncResult asyn);
@@ -283,6 +307,10 @@ namespace ChatTCP.Client
                         else
                         {
                             UpdateUsername();
+
+                            // Aggiorna lo stato e la UI
+                            _stato = Stato.Loggato;
+                            AggiornaLayout();
                         }
                     }
                     else if (message is Protocol.MessageReceivedMessage messageReceivedMessage)
@@ -386,13 +414,14 @@ namespace ChatTCP.Client
 
         private void UpdateUsername()
         {
-            var usernameText = _username;
-            if (usernameText == null)
+            if (_username != null)
             {
-                usernameText = "[Disconnesso]";
+                ConnectedAsLabel.Text = $"Connesso come: {_username}";
             }
-
-            ConnectedAsLabel.Text = $"Connesso come: {usernameText}";
+            else
+            {
+                ConnectedAsLabel.Text = "Non loggato";
+            }
         }
 
         private void OnUpdateUserInfo(string nome, string cognome)
@@ -422,27 +451,31 @@ namespace ChatTCP.Client
             {
                 case Stato.Disconnesso:
                     ImpostazioniGroupBox.Enabled = true;
+                    AccountGroupBox.Enabled = false;
                     SendGroupBox.Enabled = false;
                     ConnectButton.Enabled = true;
                     CloseButton.Enabled = false;
-                    SendButton.Enabled = false;
-                    UserInfoButton.Enabled = false;
                     break;
                 case Stato.Connessione:
                     ImpostazioniGroupBox.Enabled = false;
+                    AccountGroupBox.Enabled = false;
                     SendGroupBox.Enabled = false;
                     ConnectButton.Enabled = false;
                     CloseButton.Enabled = false;
-                    SendButton.Enabled = false;
-                    UserInfoButton.Enabled = false;
                     break;
                 case Stato.Connesso:
                     ImpostazioniGroupBox.Enabled = false;
+                    AccountGroupBox.Enabled = false;
+                    SendGroupBox.Enabled = false;
+                    ConnectButton.Enabled = false;
+                    CloseButton.Enabled = true;
+                    break;
+                case Stato.Loggato:
+                    ImpostazioniGroupBox.Enabled = false;
+                    AccountGroupBox.Enabled = true;
                     SendGroupBox.Enabled = true;
                     ConnectButton.Enabled = false;
                     CloseButton.Enabled = true;
-                    SendButton.Enabled = true;
-                    UserInfoButton.Enabled = true;
                     break;
             }
         }
