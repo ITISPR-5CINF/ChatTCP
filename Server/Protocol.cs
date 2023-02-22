@@ -104,6 +104,7 @@ namespace ChatTCP.Common
         {
             override public string action => "message_received";
 
+            public long timestamp { get; set; }
             public string username { get; set; }
             public string message { get; set; }
 
@@ -237,6 +238,18 @@ namespace ChatTCP.Common
             }
 
             return messagesList;
+        }
+
+        public static DateTimeOffset DateTimeOffsetNow => DateTimeOffset.Now;
+
+        public static long DateTimeOffsetToUNIXTimestamp(DateTimeOffset dateTimeOffset)
+        {
+            return dateTimeOffset.ToUniversalTime().ToUnixTimeMilliseconds();
+        }
+
+        public static DateTimeOffset UNIXTimestampToDateTimeOffset(long timestamp)
+        {
+            return DateTimeOffset.FromUnixTimeMilliseconds(timestamp).ToLocalTime();
         }
     }
 }

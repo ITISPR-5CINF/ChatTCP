@@ -104,6 +104,7 @@ namespace ChatTCP.Server
             string messageText = DatiTxTextBox.Text;
             Protocol.MessageReceivedMessage messageReceivedMessage = new Protocol.MessageReceivedMessage
             {
+                timestamp = Protocol.DateTimeOffsetToUNIXTimestamp(Protocol.DateTimeOffsetNow),
                 username = "admin",
                 message = messageText
             };
@@ -121,7 +122,7 @@ namespace ChatTCP.Server
                 client.GetStream().Write(messageBytes, 0, messageBytes.Length);
             }
 
-            Log($"{messageReceivedMessage.username}: {messageReceivedMessage.message}");
+            AddMessageToUI(Protocol.UNIXTimestampToDateTimeOffset(messageReceivedMessage.timestamp), messageReceivedMessage.username, messageReceivedMessage.message);
         }
 
         private void DisconnectButton_Click(object sender, EventArgs e)
@@ -330,6 +331,7 @@ namespace ChatTCP.Server
                         {
                             var messageReceivedMessage = new Protocol.MessageReceivedMessage
                             {
+                                timestamp = Protocol.DateTimeOffsetToUNIXTimestamp(Protocol.DateTimeOffsetNow),
                                 username = username,
                                 message = sendMessageMessage.message
                             };
@@ -351,7 +353,7 @@ namespace ChatTCP.Server
                                 }
                             }
 
-                            Log($"{messageReceivedMessage.username}: {messageReceivedMessage.message}");
+                            AddMessageToUI(Protocol.UNIXTimestampToDateTimeOffset(messageReceivedMessage.timestamp), messageReceivedMessage.username, messageReceivedMessage.message);
                         }
                     }
                     else if (message is Protocol.UpdateUserInfoMessage updateUserInfoMessage)
@@ -423,6 +425,11 @@ namespace ChatTCP.Server
                     DisconnectButton.Enabled = true;
                     break;
             }
+        }
+
+        private void AddMessageToUI(DateTimeOffset date, string username, string message)
+        {
+            Log($"{date:HH:mm:ss} {username}: {message}");
         }
 
         private int intLogCount = 0;

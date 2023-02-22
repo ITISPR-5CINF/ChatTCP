@@ -167,7 +167,7 @@ namespace ChatTCP.Client
                 var message = Protocol.EncodeMessage(sendMessageMessage.ToJson());
                 _stream.Write(message, 0, message.Length);
 
-                AddMessageToUI(_username, sendMessageMessage.message);
+                AddMessageToUI(Protocol.DateTimeOffsetNow, _username, sendMessageMessage.message);
             }
             catch (SocketException se)
             {
@@ -288,7 +288,7 @@ namespace ChatTCP.Client
                     else if (message is Protocol.MessageReceivedMessage messageReceivedMessage)
                     {
                         // Metti il messaggio nella UI
-                        AddMessageToUI(messageReceivedMessage.username, messageReceivedMessage.message);
+                        AddMessageToUI(Protocol.UNIXTimestampToDateTimeOffset(messageReceivedMessage.timestamp), messageReceivedMessage.username, messageReceivedMessage.message);
                     }
                     else
                     {
@@ -548,9 +548,9 @@ namespace ChatTCP.Client
             return strIpDotted;
         }
 
-        private void AddMessageToUI(string username, string message)
+        private void AddMessageToUI(DateTimeOffset date, string username, string message)
         {
-            MessagesListBox.Items.Add($"{username}: {message}");
+            MessagesListBox.Items.Add($"{date:HH:mm:ss} - {username}: {message}");
             MessagesListBox.SelectedIndex = MessagesListBox.Items.Count - 1;
         }
 
