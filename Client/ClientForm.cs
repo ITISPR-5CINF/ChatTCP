@@ -135,10 +135,17 @@ namespace ChatTCP.Client
 
         private void SendButton_Click(object sender, EventArgs e)
         {
+            string messageText = SendTextBox.Text;
+
+            // Non inviare un messaggio se vuoto
+            if (string.IsNullOrEmpty(messageText))
+            {
+                return;
+            }
+
             try
             {
                 // Serializza il messaggio
-                string messageText = SendTextBox.Text;
                 Protocol.SendMessageMessage sendMessageMessage = new Protocol.SendMessageMessage
                 {
                     message = messageText
