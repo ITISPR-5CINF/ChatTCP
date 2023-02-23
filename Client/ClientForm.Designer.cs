@@ -65,6 +65,7 @@
             // 
             // NetworkComputersComboBox
             // 
+            this.NetworkComputersComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.NetworkComputersComboBox.FormattingEnabled = true;
             this.NetworkComputersComboBox.Location = new System.Drawing.Point(6, 35);
             this.NetworkComputersComboBox.Name = "NetworkComputersComboBox";
