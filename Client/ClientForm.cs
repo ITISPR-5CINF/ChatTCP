@@ -331,6 +331,20 @@ namespace ChatTCP.Client
                         {
                             _username = null;
 
+                            // Comunica all'utente il risultato
+                            switch (loginResultMessage.result)
+                            {
+                                case Protocol.LoginResultMessage.Result.WrongCredentials:
+                                    MessageBox.Show("Login fallito: Credenziali errate");
+                                    break;
+                                case Protocol.LoginResultMessage.Result.UserAlreadyExists:
+                                    MessageBox.Show("Registrazione fallita: Username già esistente");
+                                    break;
+                                default:
+                                    MessageBox.Show("Login/registrazione fallito: Errore sconosciuto");
+                                    break;
+                            }
+
                             // Riapri il form
                             if (!OpenLoginForm())
                             {
