@@ -19,7 +19,7 @@ namespace ChatTCP.Server
         }
         private Stato _stato;
 
-        private const int DIMBUFF = 5;
+        private const int DIMBUFF = 64;
 
         private readonly byte[] receivedBytesBuffer = new byte[DIMBUFF];
         private string receivedString = "";
