@@ -496,6 +496,19 @@ namespace ChatTCP.Client
                 // Ripulisci la lista di utenti connessi
                 OnlineUsersCheckedListBox.Items.Clear();
             }
+
+            // Aggiorna IpRemotoLabel
+            if (_stato == Stato.Connesso || _stato == Stato.Loggato)
+            {
+                var ip = NetworkComputersComboBox.Text.Equals("localhost") ? "127.0.0.1" : NetworkComputersComboBox.Text;
+                var port = PortaTcpTextBox.Text;
+
+                IpRemotoLabel.Text = $"IP del server: {ip}:{port}";
+            }
+            else if (_stato == Stato.Disconnesso)
+            {
+                IpRemotoLabel.Text = "IP remoto: ";
+            }
         }
 
         private bool IsLocalIpV4Address(string host, ref string ipaddress)

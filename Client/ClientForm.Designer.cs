@@ -96,7 +96,7 @@
             // 
             this.IpRemotoLabel.Location = new System.Drawing.Point(6, 16);
             this.IpRemotoLabel.Name = "IpRemotoLabel";
-            this.IpRemotoLabel.Size = new System.Drawing.Size(60, 16);
+            this.IpRemotoLabel.Size = new System.Drawing.Size(149, 16);
             this.IpRemotoLabel.TabIndex = 0;
             this.IpRemotoLabel.Text = "IP Remoto:";
             // 
