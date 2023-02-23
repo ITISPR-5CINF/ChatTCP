@@ -170,7 +170,7 @@
             this.Controls.Add(this.SettingsGroupBox);
             this.Controls.Add(this.StartListeningButton);
             this.Name = "ServerForm";
-            this.Text = "Server";
+            this.Text = "ChatTCP Server";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ServerForm_FormClosing);
             this.Load += new System.EventHandler(this.ServerForm_Load);
             this.SettingsGroupBox.ResumeLayout(false);

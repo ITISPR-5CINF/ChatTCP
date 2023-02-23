@@ -215,7 +215,7 @@
             this.Controls.Add(this.ImpostazioniGroupBox);
             this.Controls.Add(this.ConnectButton);
             this.Name = "ClientForm";
-            this.Text = "ChatTCP";
+            this.Text = "ChatTCP Client";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ClientForm_FormClosing);
             this.Load += new System.EventHandler(this.ClientForm_Load);
             this.ImpostazioniGroupBox.ResumeLayout(false);
