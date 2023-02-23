@@ -252,7 +252,7 @@ namespace ChatTCP.Client
             }
 
             // Torna a ricevere nuovi dati
-            _stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _stream);
+            _stream?.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _stream);
         }
 
         private delegate void del_OnDataReceived(IAsyncResult asyn);
