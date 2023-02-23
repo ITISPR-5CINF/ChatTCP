@@ -37,6 +37,8 @@
             this.NomeTextBox = new System.Windows.Forms.TextBox();
             this.NomeLabel = new System.Windows.Forms.Label();
             this.UpdateUserInfoButton = new System.Windows.Forms.Button();
+            this.EmailLabel = new System.Windows.Forms.Label();
+            this.EmailTextBox = new System.Windows.Forms.TextBox();
             this.AccountGroupBox.SuspendLayout();
             this.InformazioniGroupBox.SuspendLayout();
             this.SuspendLayout();
@@ -73,6 +75,8 @@
             // 
             // InformazioniGroupBox
             // 
+            this.InformazioniGroupBox.Controls.Add(this.EmailTextBox);
+            this.InformazioniGroupBox.Controls.Add(this.EmailLabel);
             this.InformazioniGroupBox.Controls.Add(this.CognomeTextBox);
             this.InformazioniGroupBox.Controls.Add(this.CognomeLabel);
             this.InformazioniGroupBox.Controls.Add(this.NomeTextBox);
@@ -80,7 +84,7 @@
             this.InformazioniGroupBox.Controls.Add(this.UpdateUserInfoButton);
             this.InformazioniGroupBox.Location = new System.Drawing.Point(12, 84);
             this.InformazioniGroupBox.Name = "InformazioniGroupBox";
-            this.InformazioniGroupBox.Size = new System.Drawing.Size(278, 107);
+            this.InformazioniGroupBox.Size = new System.Drawing.Size(278, 133);
             this.InformazioniGroupBox.TabIndex = 3;
             this.InformazioniGroupBox.TabStop = false;
             this.InformazioniGroupBox.Text = "Informazioni";
@@ -119,7 +123,7 @@
             // 
             // UpdateUserInfoButton
             // 
-            this.UpdateUserInfoButton.Location = new System.Drawing.Point(6, 74);
+            this.UpdateUserInfoButton.Location = new System.Drawing.Point(6, 101);
             this.UpdateUserInfoButton.Name = "UpdateUserInfoButton";
             this.UpdateUserInfoButton.Size = new System.Drawing.Size(75, 23);
             this.UpdateUserInfoButton.TabIndex = 1;
@@ -127,11 +131,27 @@
             this.UpdateUserInfoButton.UseVisualStyleBackColor = true;
             this.UpdateUserInfoButton.Click += new System.EventHandler(this.UpdateUserInfoButton_Click);
             // 
+            // EmailLabel
+            // 
+            this.EmailLabel.AutoSize = true;
+            this.EmailLabel.Location = new System.Drawing.Point(6, 78);
+            this.EmailLabel.Name = "EmailLabel";
+            this.EmailLabel.Size = new System.Drawing.Size(32, 13);
+            this.EmailLabel.TabIndex = 6;
+            this.EmailLabel.Text = "Email";
+            // 
+            // EmailTextBox
+            // 
+            this.EmailTextBox.Location = new System.Drawing.Point(64, 75);
+            this.EmailTextBox.Name = "EmailTextBox";
+            this.EmailTextBox.Size = new System.Drawing.Size(208, 20);
+            this.EmailTextBox.TabIndex = 7;
+            // 
             // FormUserInfo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(302, 198);
+            this.ClientSize = new System.Drawing.Size(302, 226);
             this.Controls.Add(this.InformazioniGroupBox);
             this.Controls.Add(this.AccountGroupBox);
             this.Name = "FormUserInfo";
@@ -156,5 +176,7 @@
         private System.Windows.Forms.TextBox NomeTextBox;
         private System.Windows.Forms.Label NomeLabel;
         private System.Windows.Forms.TextBox CognomeTextBox;
+        private System.Windows.Forms.TextBox EmailTextBox;
+        private System.Windows.Forms.Label EmailLabel;
     }
 }

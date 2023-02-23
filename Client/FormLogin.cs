@@ -10,6 +10,7 @@ namespace ChatTCP.Client
         public string Password => PasswordTextBox.Text;
         public string Nome = "";
         public string Cognome = "";
+        public string Email = "";
         public string UsernameRegister = "";
         public string PasswordRegister = "";
         public bool isRegisteredInstruction = false;
@@ -43,6 +44,7 @@ namespace ChatTCP.Client
 
             Nome = signin.Nome;
             Cognome = signin.Cognome;
+            Email = signin.Email;
             UsernameRegister = signin.Username;
             PasswordRegister = signin.Password;
 

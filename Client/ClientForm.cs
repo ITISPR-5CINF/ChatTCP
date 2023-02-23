@@ -127,7 +127,7 @@ namespace ChatTCP.Client
 
         private void UserInfoButton_Click(object sender, EventArgs e)
         {
-            var form = new FormUserInfo(_username, "", "")
+            var form = new FormUserInfo(_username, "", "", "")
             {
                 OnUpdateUserInfoCallback = OnUpdateUserInfo,
                 OnChangePasswordCallback = OnChangePassword
@@ -381,6 +381,7 @@ namespace ChatTCP.Client
                 var password = formLogin.PasswordRegister;
                 var nome = formLogin.Nome;
                 var cognome = formLogin.Cognome;
+                var email = formLogin.Email;
 
                 _username = username;
 
@@ -389,7 +390,8 @@ namespace ChatTCP.Client
                     username = username,
                     password = password,
                     nome = nome,
-                    cognome = cognome
+                    cognome = cognome,
+                    email = email
                 };
 
                 var messageBytes = Protocol.EncodeMessage(registerMessage.ToJson());
@@ -432,12 +434,13 @@ namespace ChatTCP.Client
             }
         }
 
-        private void OnUpdateUserInfo(string nome, string cognome)
+        private void OnUpdateUserInfo(string nome, string cognome, string email)
         {
             var updateUserInfoMessage = new Protocol.UpdateUserInfoMessage
             {
                 nome = nome,
-                cognome = cognome
+                cognome = cognome,
+                email = email
             };
             var bytes = Protocol.EncodeMessage(updateUserInfoMessage.ToJson());
             _stream.Write(bytes, 0, bytes.Length);

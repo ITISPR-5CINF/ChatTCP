@@ -39,6 +39,8 @@ namespace ChatTCP.Client
             this.PasswordTextBox = new System.Windows.Forms.TextBox();
             this.SigninButton = new System.Windows.Forms.Button();
             this.CancelButton = new System.Windows.Forms.Button();
+            this.EmailTextBox = new System.Windows.Forms.TextBox();
+            this.EmailLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lblSignin
@@ -72,7 +74,7 @@ namespace ChatTCP.Client
             // UsernameLabel
             // 
             this.UsernameLabel.AutoSize = true;
-            this.UsernameLabel.Location = new System.Drawing.Point(12, 114);
+            this.UsernameLabel.Location = new System.Drawing.Point(12, 140);
             this.UsernameLabel.Name = "UsernameLabel";
             this.UsernameLabel.Size = new System.Drawing.Size(55, 13);
             this.UsernameLabel.TabIndex = 3;
@@ -81,7 +83,7 @@ namespace ChatTCP.Client
             // PasswordLabel
             // 
             this.PasswordLabel.AutoSize = true;
-            this.PasswordLabel.Location = new System.Drawing.Point(12, 140);
+            this.PasswordLabel.Location = new System.Drawing.Point(12, 166);
             this.PasswordLabel.Name = "PasswordLabel";
             this.PasswordLabel.Size = new System.Drawing.Size(53, 13);
             this.PasswordLabel.TabIndex = 4;
@@ -103,14 +105,14 @@ namespace ChatTCP.Client
             // 
             // UsernameTextBox
             // 
-            this.UsernameTextBox.Location = new System.Drawing.Point(73, 111);
+            this.UsernameTextBox.Location = new System.Drawing.Point(73, 137);
             this.UsernameTextBox.Name = "UsernameTextBox";
             this.UsernameTextBox.Size = new System.Drawing.Size(228, 20);
             this.UsernameTextBox.TabIndex = 7;
             // 
             // PasswordTextBox
             // 
-            this.PasswordTextBox.Location = new System.Drawing.Point(73, 137);
+            this.PasswordTextBox.Location = new System.Drawing.Point(73, 163);
             this.PasswordTextBox.Name = "PasswordTextBox";
             this.PasswordTextBox.PasswordChar = '*';
             this.PasswordTextBox.Size = new System.Drawing.Size(228, 20);
@@ -118,7 +120,7 @@ namespace ChatTCP.Client
             // 
             // SigninButton
             // 
-            this.SigninButton.Location = new System.Drawing.Point(12, 175);
+            this.SigninButton.Location = new System.Drawing.Point(17, 206);
             this.SigninButton.Name = "SigninButton";
             this.SigninButton.Size = new System.Drawing.Size(68, 23);
             this.SigninButton.TabIndex = 9;
@@ -128,7 +130,7 @@ namespace ChatTCP.Client
             // 
             // CancelButton
             // 
-            this.CancelButton.Location = new System.Drawing.Point(226, 175);
+            this.CancelButton.Location = new System.Drawing.Point(226, 206);
             this.CancelButton.Name = "CancelButton";
             this.CancelButton.Size = new System.Drawing.Size(75, 23);
             this.CancelButton.TabIndex = 10;
@@ -136,12 +138,30 @@ namespace ChatTCP.Client
             this.CancelButton.UseVisualStyleBackColor = true;
             this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
             // 
+            // EmailTextBox
+            // 
+            this.EmailTextBox.Location = new System.Drawing.Point(73, 111);
+            this.EmailTextBox.Name = "EmailTextBox";
+            this.EmailTextBox.Size = new System.Drawing.Size(228, 20);
+            this.EmailTextBox.TabIndex = 11;
+            // 
+            // EmailLabel
+            // 
+            this.EmailLabel.AutoSize = true;
+            this.EmailLabel.Location = new System.Drawing.Point(12, 114);
+            this.EmailLabel.Name = "EmailLabel";
+            this.EmailLabel.Size = new System.Drawing.Size(32, 13);
+            this.EmailLabel.TabIndex = 12;
+            this.EmailLabel.Text = "Email";
+            // 
             // FormSignin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(313, 210);
+            this.ClientSize = new System.Drawing.Size(313, 241);
             this.ControlBox = false;
+            this.Controls.Add(this.EmailLabel);
+            this.Controls.Add(this.EmailTextBox);
             this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.SigninButton);
             this.Controls.Add(this.PasswordTextBox);
@@ -173,5 +193,7 @@ namespace ChatTCP.Client
         private System.Windows.Forms.TextBox PasswordTextBox;
         private System.Windows.Forms.Button SigninButton;
         private System.Windows.Forms.Button CancelButton;
+        private System.Windows.Forms.TextBox EmailTextBox;
+        private System.Windows.Forms.Label EmailLabel;
     }
 }

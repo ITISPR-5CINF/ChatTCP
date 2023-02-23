@@ -299,7 +299,7 @@ namespace ChatTCP.Server
                     {
                         // Fai la registrazione
                         ConnectionDB connection = new ConnectionDB();
-                        var loginResultMessage = connection.Register(registerMessage.nome, registerMessage.cognome, registerMessage.username, registerMessage.password);
+                        var loginResultMessage = connection.Register(registerMessage.nome, registerMessage.cognome, registerMessage.email, registerMessage.username, registerMessage.password);
 
                         if (loginResultMessage.result == Protocol.LoginResultMessage.Result.Success)
                         {
@@ -371,7 +371,7 @@ namespace ChatTCP.Server
                         {
                             var username = _clientToUsername[client];
                             ConnectionDB connection = new ConnectionDB();
-                            connection.UpdateUserInfo(username, updateUserInfoMessage.nome, updateUserInfoMessage.cognome);
+                            connection.UpdateUserInfo(username, updateUserInfoMessage.nome, updateUserInfoMessage.cognome, updateUserInfoMessage.email);
                         }
                         else
                         {

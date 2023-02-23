@@ -5,7 +5,7 @@ namespace ChatTCP.Client
 {
     public partial class FormUserInfo : Form
     {
-        public delegate void OnUpdatedUserInfo(string nome, string cognome);
+        public delegate void OnUpdatedUserInfo(string nome, string cognome, string email);
         public OnUpdatedUserInfo OnUpdateUserInfoCallback = null;
 
         public delegate void OnChangePassword(string password);
@@ -14,12 +14,14 @@ namespace ChatTCP.Client
         private readonly string username;
         private string nome;
         private string cognome;
+        private string email;
 
-        public FormUserInfo(string username, string nome, string cognome)
+        public FormUserInfo(string username, string nome, string cognome, string email)
         {
             this.username = username;
             this.nome = nome;
             this.cognome = cognome;
+            this.email = email;
 
             InitializeComponent();
         }
@@ -40,6 +42,11 @@ namespace ChatTCP.Client
             {
                 CognomeTextBox.Text = cognome;
             }
+
+            if (email != null)
+            {
+                EmailTextBox.Text = email;
+            }
         }
 
         private void ChangePasswordButton_Click(object sender, EventArgs e)
@@ -55,6 +62,7 @@ namespace ChatTCP.Client
         {
             nome = NomeTextBox.Text;
             cognome = CognomeTextBox.Text;
+            email = EmailTextBox.Text;
 
             if (string.IsNullOrEmpty(nome))
             {
@@ -68,7 +76,7 @@ namespace ChatTCP.Client
                 return;
             }
 
-            OnUpdateUserInfoCallback?.Invoke(nome, cognome);
+            OnUpdateUserInfoCallback?.Invoke(nome, cognome, email);
 
             MessageBox.Show("Informazioni salvate");
         }

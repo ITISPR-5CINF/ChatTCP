@@ -50,7 +50,7 @@ namespace ChatTCP.Server
             return loginMessage;
         }
 
-        public Protocol.LoginResultMessage Register(string nome, string cognome, string username, string password)
+        public Protocol.LoginResultMessage Register(string nome, string cognome, string email, string username, string password)
         {
             Protocol.LoginResultMessage loginMessage = new Protocol.LoginResultMessage();
 
@@ -60,18 +60,20 @@ namespace ChatTCP.Server
                 return loginMessage;
             }
 
-            string cmdText = "INSERT INTO utenti (nome, cognome, username, password)" +
-                " VALUES (@nome, @cognome, @username, @password);";
+            string cmdText = "INSERT INTO utenti (nome, cognome, email, username, password)" +
+                " VALUES (@nome, @cognome, @email, @username, @password);";
 
             conn.Open();
 
             MySqlCommand command = new MySqlCommand(cmdText, conn);
             command.Parameters.Add("@nome", MySqlDbType.VarChar);
             command.Parameters.Add("@cognome", MySqlDbType.VarChar);
+            command.Parameters.Add("@email", MySqlDbType.VarChar);
             command.Parameters.Add("@username", MySqlDbType.VarChar);
             command.Parameters.Add("@password", MySqlDbType.VarChar);
             command.Parameters["@nome"].Value = nome;
             command.Parameters["@cognome"].Value = cognome;
+            command.Parameters["@email"].Value = email;
             command.Parameters["@username"].Value = username;
             command.Parameters["@password"].Value = password;
 
@@ -84,10 +86,10 @@ namespace ChatTCP.Server
             return loginMessage;
         }
 
-        public void UpdateUserInfo(string username, string nome, string cognome)
+        public void UpdateUserInfo(string username, string nome, string cognome, string email)
         {
             string cmdText = "UPDATE utenti" +
-                " SET nome = @nome, cognome = @cognome" +
+                " SET nome = @nome, cognome = @cognome, email = @email" +
                 " WHERE username = @username;";
 
             conn.Open();
@@ -96,9 +98,11 @@ namespace ChatTCP.Server
             command.Parameters.Add("@username", MySqlDbType.VarChar);
             command.Parameters.Add("@nome", MySqlDbType.VarChar);
             command.Parameters.Add("@cognome", MySqlDbType.VarChar);
+            command.Parameters.Add("@email", MySqlDbType.VarChar);
             command.Parameters["@username"].Value = username;
             command.Parameters["@nome"].Value = nome;
             command.Parameters["@cognome"].Value = cognome;
+            command.Parameters["@email"].Value = email;
 
             command.ExecuteNonQuery();
 

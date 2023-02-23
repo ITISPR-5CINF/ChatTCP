@@ -53,6 +53,7 @@ namespace ChatTCP.Common
             public string password { get; set; }
             public string nome { get; set; }
             public string cognome { get; set; }
+            public string email { get; set; }
 
             override public string ToJson()
             {
@@ -125,6 +126,7 @@ namespace ChatTCP.Common
 
             public string nome { get; set; }
             public string cognome { get; set; }
+            public string email { get; set; }
 
             override public string ToJson()
             {
