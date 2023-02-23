@@ -69,24 +69,18 @@ namespace ChatTCP.Server
 
             try
             {
-                // Creazione del socket in attesa sulla porta nota
-                Log("-------------------------");
-
                 // Crea socket di ricezione
                 _listener = new TcpListener(IPAddress.Any, port);
-                Log($"CALL: Listener creato ({IPAddress.Any}:{portString})");
 
                 // Avvio listening sulla porta TCP nota
                 _listener.Start();
-                Log("CALL: Listen(); Socket in listening");
-
-                // Creazione funzione di callback per accettare connessioni
-                _listener.BeginAcceptTcpClient(new AsyncCallback(OnAccept), null);
-                Log("CALL: BeginAccept(); Callback BeginAccept impostata");
 
                 // Aggiorna lo stato e la UI
                 _stato = Stato.Listening;
                 UpdateLayout();
+
+                // Creazione funzione di callback per accettare connessioni
+                _listener.BeginAcceptTcpClient(new AsyncCallback(OnAccept), null);
             }
             catch (SocketException se)
             {
@@ -169,8 +163,6 @@ namespace ChatTCP.Server
         /// </summary>
         private void DisconnectAllClients()
         {
-            Log("CALL: DisconnectClients(); Richiesta disconnessione");
-
             // Crea una copia della lista perchè durante l'iterazione non
             // si può modificare la lista originale
             foreach (TcpClient client in _clients.ToList())
@@ -188,8 +180,6 @@ namespace ChatTCP.Server
         /// </summary>
         private void StopListener()
         {
-            Log("CALL: StopListener(); socket listener");
-
             // Disconnetti tutti i client
             DisconnectAllClients();
 
@@ -214,29 +204,24 @@ namespace ChatTCP.Server
 
             if (_listener == null)
             {
-                Log("EVNT: BeginAccept(); Listener nullo");
                 return;
             }
 
             try
             {
                 var client = _listener.EndAcceptTcpClient(asyn);
-                Log("EVNT: BeginAccept(); Connessione accettata");
 
                 _clients.Add(client);
 
-                Log("CALL: BeginReceive(); Pronto a ricevere");
                 var stream = client.GetStream();
                 stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), client);
 
                 // Torna ad ascoltare nuove richieste di connessione
-                Log(".........................");
-                Log("CALL: BeginAccept(); BeginAccept REimpostata");
                 _listener.BeginAcceptTcpClient(new AsyncCallback(OnAccept), null);
             }
             catch (SocketException se)
             {
-                Log("EVNT: BeginAccept(); Errore: " + se.Message);
+                Log($"OnAccept(); Errore: {se.Message}");
                 MessageBox.Show(se.Message, "Server");
             }
         }
@@ -255,13 +240,11 @@ namespace ChatTCP.Server
 
             if (client == null)
             {
-                Log("EVNT: OnDataReceived(); Client nullo");
                 return;
             }
 
             if (!client.Connected)
             {
-                Log("EVNT: OnDataReceived(); Client non connesso");
                 DisconnectClient(client);
                 return;
             }
@@ -274,12 +257,9 @@ namespace ChatTCP.Server
 
                 if (numReceivedBytes == 0)
                 {
-                    Log("EVNT: OnDataReceived(); Disconnesso dal Client");
                     DisconnectClient(client);
                     return;
                 }
-
-                Log("EVNT: OnDataReceived();");
 
                 // Processa il messaggio ricevuto
                 string szData = Protocol.DecodeMessage(receivedBytesBuffer, numReceivedBytes);
@@ -392,12 +372,11 @@ namespace ChatTCP.Server
                 }
 
                 // Torna ad ascoltare nuovi messaggi
-                Log("CALL: BeginReceive(); Pronto a ricevere");
                 stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), client);
             }
             catch (SocketException se)
             {
-                Log("EVNT: OnDataReceived(); Errore " + se.Message);
+                Log($"EVNT: OnDataReceived(); Errore {se.Message}");
                 MessageBox.Show(se.Message, "Server");
             }
         }
