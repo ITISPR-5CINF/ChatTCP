@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Windows.Forms;
@@ -167,12 +168,15 @@ namespace ChatTCP.Client
                 return;
             }
 
+            var toUsers = OnlineUsersCheckedListBox.CheckedItems.Cast<string>().ToHashSet().ToList();
+
             try
             {
                 // Serializza il messaggio
                 Protocol.SendMessageMessage sendMessageMessage = new Protocol.SendMessageMessage
                 {
-                    message = messageText
+                    message = messageText,
+                    to_users = toUsers
                 };
 
                 if (_clientSocket == null)
@@ -191,7 +195,7 @@ namespace ChatTCP.Client
                 var message = Protocol.EncodeMessage(sendMessageMessage.ToJson());
                 _stream.Write(message, 0, message.Length);
 
-                AddMessageToUI(Protocol.DateTimeOffsetNow, _username, sendMessageMessage.message);
+                AddMessageToUI(Protocol.DateTimeOffsetNow, _username, sendMessageMessage.message, toUsers);
             }
             catch (SocketException se)
             {
@@ -316,7 +320,11 @@ namespace ChatTCP.Client
                     else if (message is Protocol.MessageReceivedMessage messageReceivedMessage)
                     {
                         // Metti il messaggio nella UI
-                        AddMessageToUI(Protocol.UNIXTimestampToDateTimeOffset(messageReceivedMessage.timestamp), messageReceivedMessage.username, messageReceivedMessage.message);
+                        AddMessageToUI(Protocol.UNIXTimestampToDateTimeOffset(messageReceivedMessage.timestamp), messageReceivedMessage.username, messageReceivedMessage.message, messageReceivedMessage.to_users);
+                    }
+                    else if (message is Protocol.UpdatedOnlineUsersMessage updatedOnlineUsersMessage)
+                    {
+                        AddUserToOU(updatedOnlineUsersMessage.online_users);
                     }
                     else
                     {
@@ -455,6 +463,7 @@ namespace ChatTCP.Client
                     SendGroupBox.Enabled = false;
                     ConnectButton.Enabled = true;
                     CloseButton.Enabled = false;
+                    OnlineUsersGroupBox.Enabled = false;
                     break;
                 case Stato.Connessione:
                     ImpostazioniGroupBox.Enabled = false;
@@ -462,6 +471,7 @@ namespace ChatTCP.Client
                     SendGroupBox.Enabled = false;
                     ConnectButton.Enabled = false;
                     CloseButton.Enabled = false;
+                    OnlineUsersGroupBox.Enabled = false;
                     break;
                 case Stato.Connesso:
                     ImpostazioniGroupBox.Enabled = false;
@@ -469,6 +479,7 @@ namespace ChatTCP.Client
                     SendGroupBox.Enabled = false;
                     ConnectButton.Enabled = false;
                     CloseButton.Enabled = true;
+                    OnlineUsersGroupBox.Enabled = false;
                     break;
                 case Stato.Loggato:
                     ImpostazioniGroupBox.Enabled = false;
@@ -476,7 +487,14 @@ namespace ChatTCP.Client
                     SendGroupBox.Enabled = true;
                     ConnectButton.Enabled = false;
                     CloseButton.Enabled = true;
+                    OnlineUsersGroupBox.Enabled = true;
                     break;
+            }
+
+            if (_stato != Stato.Loggato)
+            {
+                // Ripulisci la lista di utenti connessi
+                OnlineUsersCheckedListBox.Items.Clear();
             }
         }
 
@@ -581,10 +599,27 @@ namespace ChatTCP.Client
             return strIpDotted;
         }
 
-        private void AddMessageToUI(DateTimeOffset date, string username, string message)
+        private void AddMessageToUI(DateTimeOffset date, string username, string message, List<string> toUsers = null)
         {
-            MessagesListBox.Items.Add($"{date:HH:mm:ss} - {username}: {message}");
+            if (toUsers != null && toUsers.Count > 0)
+            {
+                MessagesListBox.Items.Add($"{date:HH:mm:ss} - {username} -> {string.Join(", ", toUsers.ToArray())}: {message}");
+            }
+            else
+            {
+                MessagesListBox.Items.Add($"{date:HH:mm:ss} - {username}: {message}");
+            }
+
             MessagesListBox.SelectedIndex = MessagesListBox.Items.Count - 1;
+        }
+
+        private void AddUserToOU(List<string> users)
+        {
+            OnlineUsersCheckedListBox.Items.Clear();
+            foreach (string user in users)
+            {
+                OnlineUsersCheckedListBox.Items.Add(user);
+            }
         }
 
         private int intLogCount = 0;

@@ -45,10 +45,13 @@
             this.UserInfoButton = new System.Windows.Forms.Button();
             this.AccountGroupBox = new System.Windows.Forms.GroupBox();
             this.LogoutButton = new System.Windows.Forms.Button();
+            this.OnlineUsersGroupBox = new System.Windows.Forms.GroupBox();
+            this.OnlineUsersCheckedListBox = new System.Windows.Forms.CheckedListBox();
             this.ImpostazioniGroupBox.SuspendLayout();
             this.SendGroupBox.SuspendLayout();
             this.LoggingGroupBox.SuspendLayout();
             this.AccountGroupBox.SuspendLayout();
+            this.OnlineUsersGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // ImpostazioniGroupBox
@@ -216,11 +219,30 @@
             this.LogoutButton.UseVisualStyleBackColor = true;
             this.LogoutButton.Click += new System.EventHandler(this.LogoutButton_Click);
             // 
+            // OnlineUsersGroupBox
+            // 
+            this.OnlineUsersGroupBox.Controls.Add(this.OnlineUsersCheckedListBox);
+            this.OnlineUsersGroupBox.Location = new System.Drawing.Point(579, 12);
+            this.OnlineUsersGroupBox.Name = "OnlineUsersGroupBox";
+            this.OnlineUsersGroupBox.Size = new System.Drawing.Size(135, 399);
+            this.OnlineUsersGroupBox.TabIndex = 15;
+            this.OnlineUsersGroupBox.TabStop = false;
+            this.OnlineUsersGroupBox.Text = "Utenti online";
+            // 
+            // OnlineUsersCheckedListBox
+            // 
+            this.OnlineUsersCheckedListBox.FormattingEnabled = true;
+            this.OnlineUsersCheckedListBox.Location = new System.Drawing.Point(6, 19);
+            this.OnlineUsersCheckedListBox.Name = "OnlineUsersCheckedListBox";
+            this.OnlineUsersCheckedListBox.Size = new System.Drawing.Size(123, 364);
+            this.OnlineUsersCheckedListBox.TabIndex = 16;
+            // 
             // ClientForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(583, 423);
+            this.ClientSize = new System.Drawing.Size(726, 423);
+            this.Controls.Add(this.OnlineUsersGroupBox);
             this.Controls.Add(this.AccountGroupBox);
             this.Controls.Add(this.LoggingGroupBox);
             this.Controls.Add(this.SendGroupBox);
@@ -238,6 +260,7 @@
             this.LoggingGroupBox.ResumeLayout(false);
             this.AccountGroupBox.ResumeLayout(false);
             this.AccountGroupBox.PerformLayout();
+            this.OnlineUsersGroupBox.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -261,5 +284,7 @@
         private System.Windows.Forms.Button UserInfoButton;
         private System.Windows.Forms.GroupBox AccountGroupBox;
         private System.Windows.Forms.Button LogoutButton;
+        private System.Windows.Forms.GroupBox OnlineUsersGroupBox;
+        private System.Windows.Forms.CheckedListBox OnlineUsersCheckedListBox;
     }
 }

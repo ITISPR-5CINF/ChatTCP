@@ -89,6 +89,7 @@ namespace ChatTCP.Common
         {
             override public string action => "send_message";
 
+            public List<string> to_users { get; set; }
             public string message { get; set; }
 
             override public string ToJson()
@@ -106,6 +107,7 @@ namespace ChatTCP.Common
 
             public long timestamp { get; set; }
             public string username { get; set; }
+            public List<string> to_users { get; set; }
             public string message { get; set; }
 
             override public string ToJson()
@@ -158,6 +160,18 @@ namespace ChatTCP.Common
             }
         }
 
+        public class UpdatedOnlineUsersMessage : BaseMessage
+        {
+            override public string action => "updated_online_users";
+
+            public List<string> online_users { get; set; }
+
+            public override string ToJson()
+            {
+                return JsonSerializer.Serialize(this);
+            }
+        }
+
         /// <summary>
         /// Converti una stringa JSON in oggetto
         /// </summary>
@@ -192,6 +206,8 @@ namespace ChatTCP.Common
                         return JsonSerializer.Deserialize<ChangePasswordMessage>(json);
                     case "logout":
                         return JsonSerializer.Deserialize<LogoutMessage>(json);
+                    case "updated_online_users":
+                        return JsonSerializer.Deserialize<UpdatedOnlineUsersMessage>(json);
                     default:
                         // throw new Exception("Unknown action");
                         return null;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -105,32 +106,36 @@ namespace ChatTCP.Server
         /// <param name="client">il client da disconnettere</param>
         private void DisconnectClient(TcpClient client)
         {
-            if (client == null)
+            if (client != null)
             {
-                return;
-            }
+                // Rimuovi l'oggetto dalla lista prima di distruggerlo
+                _clientToUsername.Remove(client);
+                _clients.Remove(client);
 
-            // Rimuovi l'oggetto dalla lista prima di distruggerlo
-            _clientToUsername.Remove(client);
-            _clients.Remove(client);
-
-            // Prova a distruggere l'oggetto
-            try {
-                // Chiudi la stream
-                var stream = client.GetStream();
+                // Prova a distruggere l'oggetto
                 try
                 {
-                    stream?.Close();
+                    // Chiudi la stream
+                    var stream = client.GetStream();
+                    try
+                    {
+                        stream?.Close();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // Ci abbiamo provato
+                    }
+
+                    // Chiudi definitivamente il client
+                    client?.Close();
                 }
-                catch (ObjectDisposedException) {
+                catch (ObjectDisposedException)
+                {
                     // Ci abbiamo provato
                 }
-
-                // Chiudi definitivamente il client
-                client?.Close();
-            } catch (ObjectDisposedException) {
-                // Ci abbiamo provato
             }
+
+            OnOnlineUsersUpdated();
         }
 
         /// <summary>
@@ -165,6 +170,31 @@ namespace ChatTCP.Server
             // Aggiorna lo stato e la UI
             _stato = Stato.Iniziale;
             UpdateLayout();
+        }
+
+        /// <summary>
+        /// Chiama questa funzione quando la lista degli utenti online è cambiata
+        /// Questa funzione si occupa di informare i client di ciò
+        /// </summary>
+        private void OnOnlineUsersUpdated()
+        {
+            HashSet<string> onlineUsers = new HashSet<string>();
+
+            foreach (var clients in _clientToUsername)
+            {
+                onlineUsers.Add(clients.Value);
+            }
+
+            var updatedOnlineUsersMessage = new Protocol.UpdatedOnlineUsersMessage
+            {
+                online_users = onlineUsers.ToList(),
+            };
+            byte[] messageBytes = Protocol.EncodeMessage(updatedOnlineUsersMessage.ToJson());
+
+            foreach (var clients in _clientToUsername)
+            {
+                clients.Key.GetStream().Write(messageBytes, 0, messageBytes.Length);
+            }
         }
 
         private delegate void del_OnAccept(IAsyncResult asyn);
@@ -256,6 +286,9 @@ namespace ChatTCP.Server
                         if (loginResultMessage.result == Protocol.LoginResultMessage.Result.Success)
                         {
                             _clientToUsername[client] = loginMessage.username;
+
+                            // Aggiorna gli altri client del nuovo utente connesso
+                            OnOnlineUsersUpdated();
                         }
 
                         // Invia il risultato
@@ -271,6 +304,9 @@ namespace ChatTCP.Server
                         if (loginResultMessage.result == Protocol.LoginResultMessage.Result.Success)
                         {
                             _clientToUsername[client] = registerMessage.username;
+
+                            // Aggiorna gli altri client del nuovo utente connesso
+                            OnOnlineUsersUpdated();
                         }
 
                         // Invia il risultato
@@ -288,22 +324,39 @@ namespace ChatTCP.Server
                             {
                                 timestamp = Protocol.DateTimeOffsetToUNIXTimestamp(Protocol.DateTimeOffsetNow),
                                 username = username,
+                                to_users = sendMessageMessage.to_users,
                                 message = sendMessageMessage.message
                             };
                             byte[] bytes = Protocol.EncodeMessage(messageReceivedMessage.ToJson());
 
-                            foreach (var clients in _clients.ToList())
+                            // Determiniamo i client che devono ricevere il messaggio
+                            HashSet<TcpClient> targetClients = new HashSet<TcpClient>();
+                            if (sendMessageMessage.to_users != null && sendMessageMessage.to_users.Count > 0)
                             {
-                                if (!clients.Connected)
+                                foreach (string user in sendMessageMessage.to_users)
+                                {
+                                    targetClients = (from kvp in _clientToUsername
+                                                     where kvp.Value == user
+                                                     select kvp.Key).ToHashSet();
+                                }
+                            }
+                            else
+                            {
+                                targetClients = _clientToUsername.Keys.ToHashSet();
+                            }
+
+                            foreach (var targetClient in targetClients)
+                            {
+                                if (!targetClient.Connected)
                                 {
                                     Log("Client non connesso");
-                                    DisconnectClient(clients);
+                                    DisconnectClient(targetClient);
                                     continue;
                                 }
 
-                                if (clients != client)
+                                if (targetClient != client)
                                 {
-                                    NetworkStream streamClient = clients.GetStream();
+                                    NetworkStream streamClient = targetClient.GetStream();
                                     streamClient.Write(bytes, 0, bytes.Length);
                                 }
                             }
@@ -345,6 +398,9 @@ namespace ChatTCP.Server
                         if (_clientToUsername.ContainsKey(client))
                         {
                             _clientToUsername.Remove(client);
+
+                            // Aggiorna gli altri client dell'utente disconnesso
+                            OnOnlineUsersUpdated();
                         }
                         else
                         {
