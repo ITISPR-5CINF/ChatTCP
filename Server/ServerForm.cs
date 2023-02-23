@@ -11,8 +11,6 @@ namespace ChatTCP.Server
 {
     public partial class ServerForm : Form
     {
-        private const string WINDOWTITLE = "Socket Server in C#";
-
         private enum Stato
         {
             Iniziale,
@@ -36,9 +34,6 @@ namespace ChatTCP.Server
 
         private void ServerForm_Load(object sender, EventArgs e)
         {
-            // Imposta il titolo della finestra
-            Text = WINDOWTITLE;
-
             // Imposta porta di default
             PortaTcpTextBox.Text = Convert.ToString(Protocol.DEFAULT_PORT);
 
@@ -79,6 +74,8 @@ namespace ChatTCP.Server
                 _stato = Stato.Listening;
                 UpdateLayout();
 
+                Log("Server avviato");
+
                 // Creazione funzione di callback per accettare connessioni
                 _listener.BeginAcceptTcpClient(new AsyncCallback(OnAccept), null);
             }
@@ -91,37 +88,15 @@ namespace ChatTCP.Server
         private void StopListeningButton_Click(object sender, EventArgs e)
         {
             StopListener();
+
+            Log("Server fermato");
         }
 
-        private void SendButton_Click(object sender, EventArgs e)
-        {
-            string messageText = DatiTxTextBox.Text;
-            Protocol.MessageReceivedMessage messageReceivedMessage = new Protocol.MessageReceivedMessage
-            {
-                timestamp = Protocol.DateTimeOffsetToUNIXTimestamp(Protocol.DateTimeOffsetNow),
-                username = "admin",
-                message = messageText
-            };
-            var messageBytes = Protocol.EncodeMessage(messageReceivedMessage.ToJson());
-
-            foreach (var client in _clients.ToList())
-            {
-                if (!client.Connected)
-                {
-                    Log("Client non connesso");
-                    DisconnectClient(client);
-                    continue;
-                }
-
-                client.GetStream().Write(messageBytes, 0, messageBytes.Length);
-            }
-
-            AddMessageToUI(Protocol.UNIXTimestampToDateTimeOffset(messageReceivedMessage.timestamp), messageReceivedMessage.username, messageReceivedMessage.message);
-        }
-
-        private void DisconnectButton_Click(object sender, EventArgs e)
+        private void DisconnectEveryoneButton_Click(object sender, EventArgs e)
         {
             DisconnectAllClients();
+
+            Log("Disconnessi tutti i client");
         }
 
         /// <summary>
@@ -399,21 +374,17 @@ namespace ChatTCP.Server
             {
                 case Stato.Iniziale:
                     SettingsGroupBox.Enabled = true;
-                    DatiTxGroupBox.Enabled = false;
                     DatiRxGroupBox.Enabled = false;
                     StartListeningButton.Enabled = true;
                     StopListeningButton.Enabled = false;
-                    SendButton.Enabled = false;
-                    DisconnectButton.Enabled = false;
+                    DisconnectEveryoneButton.Enabled = false;
                     break;
                 case Stato.Listening:
                     SettingsGroupBox.Enabled = false;
-                    DatiTxGroupBox.Enabled = true;
                     DatiRxGroupBox.Enabled = true;
                     StartListeningButton.Enabled = false;
                     StopListeningButton.Enabled = true;
-                    SendButton.Enabled = true;
-                    DisconnectButton.Enabled = true;
+                    DisconnectEveryoneButton.Enabled = true;
                     break;
             }
         }
