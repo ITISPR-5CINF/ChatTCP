@@ -100,23 +100,22 @@ namespace ChatTCP.Client
             IPAddress ipAddress = IPAddress.Parse(ipAddressString);
             long rawIpAddress = (uint)BitConverter.ToInt32(ipAddress.GetAddressBytes(), 0);
 
+            // Aggiorna lo stato e la UI
+            _stato = Stato.Connessione;
+            AggiornaLayout();
+
+            // Creazione del socket
+            _clientSocket = new TcpClient();
+
             try
             {
-                // Creazione del socket
-                _clientSocket = new TcpClient();
-                Log("CALL: Socket creato (" + ipAddressString + ":" + portString + ")");
-
-                // Associazione dell'endpoint (indirizzo IP locale/porta TCP) al socket
+                // Inizia la connessione con il server
                 _clientSocket.BeginConnect(ipAddress, port, new AsyncCallback(OnConnect), null);
-                Log("CALL: BeginConnect(); Richiesta connessione");
-
-                // Aggiorna lo stato e la UI
-                _stato = Stato.Connessione;
-                AggiornaLayout();
             }
             catch (SocketException se)
             {
-                MessageBox.Show(se.Message, "Client");
+                MessageBox.Show($"Errore: {se.Message}");
+                CloseConnection();
             }
         }
 
@@ -141,7 +140,18 @@ namespace ChatTCP.Client
             var logoutMessage = new Protocol.LogoutMessage();
 
             var bytes = Protocol.EncodeMessage(logoutMessage.ToJson());
-            _stream.Write(bytes, 0, bytes.Length);
+
+            try
+            {
+                _stream.Write(bytes, 0, bytes.Length);
+            }
+            catch (SocketException se)
+            {
+                Log($"Logout: Errore: {se.Message}");
+                MessageBox.Show(se.Message);
+                CloseConnection();
+                return;
+            }
 
             // Rimuovi le informazioni del client connesso per liberare lo spazio in memoria per un altro
             _username = null;
@@ -168,39 +178,45 @@ namespace ChatTCP.Client
                 return;
             }
 
+            if (_clientSocket == null)
+            {
+                Log("Send: Client nullo");
+                MessageBox.Show("Non connesso a nessun server");
+                CloseConnection();
+                return;
+            }
+
+            if (!_clientSocket.Connected)
+            {
+                Log("Send: Client non connesso");
+                MessageBox.Show("Non connesso a nessun server");
+                CloseConnection();
+                return;
+            }
+
+            // Serializza il messaggio
             var toUsers = OnlineUsersCheckedListBox.CheckedItems.Cast<string>().ToHashSet().ToList();
+            Protocol.SendMessageMessage sendMessageMessage = new Protocol.SendMessageMessage
+            {
+                message = messageText,
+                to_users = toUsers
+            };
+            var messageBytes = Protocol.EncodeMessage(sendMessageMessage.ToJson());
 
             try
             {
-                // Serializza il messaggio
-                Protocol.SendMessageMessage sendMessageMessage = new Protocol.SendMessageMessage
-                {
-                    message = messageText,
-                    to_users = toUsers
-                };
-
-                if (_clientSocket == null)
-                {
-                    Log("Client nullo");
-                    return;
-                }
-
-                if (!_clientSocket.Connected)
-                {
-                    Log("Client non connesso");
-                    return;
-                }
-
-                Log("CALL: Send();");
-                var message = Protocol.EncodeMessage(sendMessageMessage.ToJson());
-                _stream.Write(message, 0, message.Length);
-
-                AddMessageToUI(Protocol.DateTimeOffsetNow, _username, sendMessageMessage.message, toUsers);
+                _stream.Write(messageBytes, 0, messageBytes.Length);
             }
             catch (SocketException se)
             {
-                MessageBox.Show(se.Message, "Client");
+                Log($"Send: Errore: {se.Message}");
+                MessageBox.Show(se.Message);
+                CloseConnection();
+                return;
             }
+
+            // Aggiungi il messaggio nella UI
+            AddMessageToUI(Protocol.DateTimeOffsetNow, _username, sendMessageMessage.message, toUsers);
 
             // Ripulisi la textbox
             SendTextBox.Text = "";
@@ -216,43 +232,48 @@ namespace ChatTCP.Client
                 return;
             }
 
-            // Controlla che la funzione asincrona sia terminata
-            if (!asyn.IsCompleted)
+            // Controlla che il client non sia nullo
+            if (_clientSocket == null)
             {
+                MessageBox.Show("Client nullo");
+                CloseConnection();
                 return;
             }
 
-            // Controlla che la connessione sia avvenuta con successo
+            // Controlla che siamo ancora connessi con il server
             if (!_clientSocket.Connected)
             {
-                Log("EVNT: OnConnect(); Connessione NON accettata");
                 MessageBox.Show("Impossibile connettersi", "Client");
-
-                // Aggiorna lo stato e la UI
-                _stato = Stato.Disconnesso;
-                AggiornaLayout();
-
+                CloseConnection();
                 return;
             }
 
-            _clientSocket.EndConnect(asyn);
-            Log("EVNT: OnConnect(); Connessione accettata");
-            Log("CALL: BeginReceive(); Pronto a ricevere");
-            _stream = _clientSocket.GetStream();
-
-            // Aggiorna lo stato e la UI
-            _stato = Stato.Connesso;
-            AggiornaLayout();
-
-            // Apri il form
-            if (!OpenLoginForm())
+            try
             {
-                // Chiudi la connessione
+                _clientSocket.EndConnect(asyn);
+
+                _stream = _clientSocket.GetStream();
+
+                // Aggiorna lo stato e la UI
+                _stato = Stato.Connesso;
+                AggiornaLayout();
+
+                // Apri il form
+                if (!OpenLoginForm())
+                {
+                    // Chiudi la connessione
+                    CloseConnection();
+                }
+
+                // Torna a ricevere nuovi dati
+                _stream?.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _stream);
+            }
+            catch (SocketException se)
+            {
+                Log($"OnConnect: Errore: {se.Message}");
+                MessageBox.Show(se.Message);
                 CloseConnection();
             }
-
-            // Torna a ricevere nuovi dati
-            _stream?.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _stream);
         }
 
         private delegate void del_OnDataReceived(IAsyncResult asyn);
@@ -265,24 +286,33 @@ namespace ChatTCP.Client
                 return;
             }
 
+            // Controlla che il client non sia nullo
+            if (_clientSocket == null)
+            {
+                Log("OnDataReceived(): Client nullo");
+                CloseConnection();
+                return;
+            }
+
+            // Controlla che siamo ancora connessi con il server
+            if (!_clientSocket.Connected)
+            {
+                Log("OnDataReceived(): Disconnesso dal client");
+                CloseConnection();
+                return;
+            }
+
             try
             {
-                if (_clientSocket == null || !_clientSocket.Connected)
-                {
-                    Log("EVNT: OnDataReceived(); Disconnesso dal Client");
-                    return;
-                }
-
                 int numReceivedBytes = _stream.EndRead(asyn);
 
                 if (numReceivedBytes == 0)
                 {
-                    Log("EVNT: OnDataReceived(); Disconnesso dal Server");
+                    Log("OnDataReceived(): Disconnesso dal client");
+                    MessageBox.Show("Disconnesso dal server");
                     CloseConnection();
                     return;
                 }
-
-                Log("EVNT: OnDataReceived();");
 
                 // Processa il messaggio ricevuto
                 string szData = Protocol.DecodeMessage(receivedBytesBuffer, numReceivedBytes);
@@ -334,13 +364,14 @@ namespace ChatTCP.Client
                 }
 
                 // Torna ad ascoltare nuovi messaggi
-                Log("CALL: BeginReceive(); Pronto a ricevere");
                 _stream?.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _stream);
             }
             catch (SocketException se)
             {
-                Log("EVNT: OnDataReceived(); Errore " + se.Message);
-                MessageBox.Show(se.Message, "Client");
+                Log($"OnDataReceived(): Errore: {se.Message}");
+                MessageBox.Show(se.Message);
+                CloseConnection();
+                return;
             }
         }
 
@@ -373,7 +404,18 @@ namespace ChatTCP.Client
                 };
 
                 var messageBytes = Protocol.EncodeMessage(loginMessage.ToJson());
-                _stream.Write(messageBytes, 0, messageBytes.Length);
+
+                try
+                {
+                    _stream.Write(messageBytes, 0, messageBytes.Length);
+                }
+                catch (SocketException se)
+                {
+                    Log($"OpenLoginForm(): Errore: {se.Message}");
+                    MessageBox.Show(se.Message);
+                    CloseConnection();
+                    return false;
+                }
             }
             else
             {
@@ -395,7 +437,18 @@ namespace ChatTCP.Client
                 };
 
                 var messageBytes = Protocol.EncodeMessage(registerMessage.ToJson());
-                _stream.Write(messageBytes, 0, messageBytes.Length);
+
+                try
+                {
+                    _stream.Write(messageBytes, 0, messageBytes.Length);
+                }
+                catch (SocketException se)
+                {
+                    Log($"OpenLoginForm(): Errore: {se.Message}");
+                    MessageBox.Show(se.Message);
+                    CloseConnection();
+                    return false;
+                }
             }
 
             return true;
@@ -442,8 +495,19 @@ namespace ChatTCP.Client
                 cognome = cognome,
                 email = email
             };
-            var bytes = Protocol.EncodeMessage(updateUserInfoMessage.ToJson());
-            _stream.Write(bytes, 0, bytes.Length);
+            var messageBytes = Protocol.EncodeMessage(updateUserInfoMessage.ToJson());
+
+            try
+            {
+                _stream.Write(messageBytes, 0, messageBytes.Length);
+            }
+            catch (SocketException se)
+            {
+                Log($"OnUpdateUserInfo(): Errore: {se.Message}");
+                MessageBox.Show(se.Message);
+                CloseConnection();
+                return;
+            }
         }
 
         private void OnChangePassword(string password)
@@ -452,8 +516,19 @@ namespace ChatTCP.Client
             {
                 new_password = password
             };
-            var bytes = Protocol.EncodeMessage(changePasswordMessage.ToJson());
-            _stream.Write(bytes, 0, bytes.Length);
+            var messageBytes = Protocol.EncodeMessage(changePasswordMessage.ToJson());
+
+            try
+            {
+                _stream.Write(messageBytes, 0, messageBytes.Length);
+            }
+            catch (SocketException se)
+            {
+                Log($"OnChangePassword(): Errore: {se.Message}");
+                MessageBox.Show(se.Message);
+                CloseConnection();
+                return;
+            }
         }
 
         private void AggiornaLayout()
@@ -501,14 +576,14 @@ namespace ChatTCP.Client
             }
 
             // Aggiorna IpRemotoLabel
-            if (_stato == Stato.Connesso || _stato == Stato.Loggato)
+            if (_stato != Stato.Disconnesso)
             {
                 var ip = NetworkComputersComboBox.Text.Equals("localhost") ? "127.0.0.1" : NetworkComputersComboBox.Text;
                 var port = PortaTcpTextBox.Text;
 
                 IpRemotoLabel.Text = $"IP del server: {ip}:{port}";
             }
-            else if (_stato == Stato.Disconnesso)
+            else
             {
                 IpRemotoLabel.Text = "IP remoto: ";
             }
