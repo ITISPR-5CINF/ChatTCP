@@ -211,11 +211,12 @@ namespace ChatTCP.Server
         /// </summary>
         private void OnOnlineUsersUpdated()
         {
-            var onlineUsers = _clientToUsername.Values.ToHashSet();
+            var onlineUsers = _clientToUsername.Values.ToHashSet().ToList();
+            onlineUsers.Sort();
 
             var updatedOnlineUsersMessage = new Protocol.UpdatedOnlineUsersMessage
             {
-                online_users = onlineUsers.ToList(),
+                online_users = onlineUsers,
             };
             byte[] messageBytes = Protocol.EncodeMessage(updatedOnlineUsersMessage.ToJson());
 

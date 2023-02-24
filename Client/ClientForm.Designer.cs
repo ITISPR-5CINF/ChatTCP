@@ -237,6 +237,7 @@
             this.OnlineUsersCheckedListBox.Location = new System.Drawing.Point(6, 19);
             this.OnlineUsersCheckedListBox.Name = "OnlineUsersCheckedListBox";
             this.OnlineUsersCheckedListBox.Size = new System.Drawing.Size(123, 364);
+            this.OnlineUsersCheckedListBox.Sorted = true;
             this.OnlineUsersCheckedListBox.TabIndex = 16;
             // 
             // ClientForm
