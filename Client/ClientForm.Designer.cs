@@ -231,6 +231,7 @@
             // 
             // OnlineUsersCheckedListBox
             // 
+            this.OnlineUsersCheckedListBox.CheckOnClick = true;
             this.OnlineUsersCheckedListBox.FormattingEnabled = true;
             this.OnlineUsersCheckedListBox.Location = new System.Drawing.Point(6, 19);
             this.OnlineUsersCheckedListBox.Name = "OnlineUsersCheckedListBox";
