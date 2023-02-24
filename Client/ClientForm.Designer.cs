@@ -172,6 +172,7 @@
             // 
             this.LoggingListBox.Font = new System.Drawing.Font("Courier New", 8.25F);
             this.LoggingListBox.FormattingEnabled = true;
+            this.LoggingListBox.HorizontalScrollbar = true;
             this.LoggingListBox.ItemHeight = 14;
             this.LoggingListBox.Location = new System.Drawing.Point(6, 19);
             this.LoggingListBox.Name = "LoggingListBox";

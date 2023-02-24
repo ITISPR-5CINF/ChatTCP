@@ -118,7 +118,8 @@ namespace ChatTCP.Client
             }
             catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                MessageBox.Show($"Errore: {ex.Message}");
+                Log($"Connect: Errore: {ex.Message}");
+                MessageBox.Show(ex.Message);
                 CloseConnection();
             }
         }
@@ -159,7 +160,6 @@ namespace ChatTCP.Client
 
             // Rimuovi le informazioni del client connesso per liberare lo spazio in memoria per un altro
             _username = null;
-            UpdateUsername();
 
             // Aggiorna lo stato e la UI
             _stato = Stato.Connesso;
@@ -199,7 +199,8 @@ namespace ChatTCP.Client
             // Controlla che il client non sia nullo
             if (_clientSocket == null)
             {
-                MessageBox.Show("Client nullo");
+                Log("OnConnect: Client nullo");
+                MessageBox.Show("Errore: Client nullo");
                 CloseConnection();
                 return;
             }
@@ -207,7 +208,8 @@ namespace ChatTCP.Client
             // Controlla che siamo ancora connessi con il server
             if (!_clientSocket.Connected)
             {
-                MessageBox.Show("Impossibile connettersi", "Client");
+                Log("OnConnect: Impossibile connettersi");
+                MessageBox.Show("Impossibile connettersi");
                 CloseConnection();
                 return;
             }
@@ -253,7 +255,7 @@ namespace ChatTCP.Client
             // Controlla che il client non sia nullo
             if (_clientSocket == null)
             {
-                Log("OnDataReceived(): Client nullo");
+                Log("OnDataReceived: Client nullo");
                 CloseConnection();
                 return;
             }
@@ -261,7 +263,7 @@ namespace ChatTCP.Client
             // Controlla che siamo ancora connessi con il server
             if (!_clientSocket.Connected)
             {
-                Log("OnDataReceived(): Disconnesso dal client");
+                Log("OnDataReceived: Disconnesso dal client");
                 CloseConnection();
                 return;
             }
@@ -272,7 +274,7 @@ namespace ChatTCP.Client
 
                 if (numReceivedBytes == 0)
                 {
-                    Log("OnDataReceived(): Disconnesso dal client");
+                    Log("OnDataReceived: Disconnesso dal client");
                     MessageBox.Show("Disconnesso dal server");
                     CloseConnection();
                     return;
@@ -318,8 +320,6 @@ namespace ChatTCP.Client
                         }
                         else
                         {
-                            UpdateUsername();
-
                             // Aggiorna lo stato e la UI
                             _stato = Stato.Loggato;
                             AggiornaLayout();
@@ -336,7 +336,7 @@ namespace ChatTCP.Client
                     }
                     else
                     {
-                        Log("Messaggio sconosciuto ricevuto dal server");
+                        Log("OnDataReceived: Messaggio sconosciuto ricevuto dal server");
                         Log(messageText);
                     }
                 }
@@ -346,7 +346,7 @@ namespace ChatTCP.Client
             }
             catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"OnDataReceived(): Errore: {ex.Message}");
+                Log($"OnDataReceived: Errore: {ex.Message}");
                 MessageBox.Show(ex.Message);
                 CloseConnection();
                 return;
@@ -389,7 +389,7 @@ namespace ChatTCP.Client
                 }
                 catch (Exception ex) when (ex is SocketException || ex is IOException)
                 {
-                    Log($"OpenLoginForm(): Errore: {ex.Message}");
+                    Log($"OpenLoginForm: Errore: {ex.Message}");
                     MessageBox.Show(ex.Message);
                     CloseConnection();
                     return false;
@@ -422,7 +422,7 @@ namespace ChatTCP.Client
                 }
                 catch (Exception ex) when (ex is SocketException || ex is IOException)
                 {
-                    Log($"OpenLoginForm(): Errore: {ex.Message}");
+                    Log($"OpenLoginForm: Errore: {ex.Message}");
                     MessageBox.Show(ex.Message);
                     CloseConnection();
                     return false;
@@ -434,7 +434,7 @@ namespace ChatTCP.Client
 
         private void CloseConnection()
         {
-            Log("CALL: CloseConnection(); Richiesta disconnessione");
+            Log("CloseConnection: Disconnessione");
 
             // Chiudi la stream
             _stream?.Close();
@@ -446,7 +446,6 @@ namespace ChatTCP.Client
 
             // Pulisci lo username
             _username = null;
-            UpdateUsername();
 
             // Aggiorna lo stato e la UI
             _stato = Stato.Disconnesso;
@@ -510,18 +509,6 @@ namespace ChatTCP.Client
             SendTextBox.Text = "";
         }
 
-        private void UpdateUsername()
-        {
-            if (_username != null)
-            {
-                ConnectedAsLabel.Text = $"Connesso come: {_username}";
-            }
-            else
-            {
-                ConnectedAsLabel.Text = "Non loggato";
-            }
-        }
-
         private void OnUpdateUserInfo(string nome, string cognome, string email)
         {
             var updateUserInfoMessage = new Protocol.UpdateUserInfoMessage
@@ -538,7 +525,7 @@ namespace ChatTCP.Client
             }
             catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"OnUpdateUserInfo(): Errore: {ex.Message}");
+                Log($"OnUpdateUserInfo: Errore: {ex.Message}");
                 MessageBox.Show(ex.Message);
                 CloseConnection();
                 return;
@@ -559,7 +546,7 @@ namespace ChatTCP.Client
             }
             catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"OnChangePassword(): Errore: {ex.Message}");
+                Log($"OnChangePassword: Errore: {ex.Message}");
                 MessageBox.Show(ex.Message);
                 CloseConnection();
                 return;
@@ -621,6 +608,16 @@ namespace ChatTCP.Client
             else
             {
                 IpRemotoLabel.Text = "IP remoto: ";
+            }
+
+            // Aggiorna l'username
+            if (_stato == Stato.Loggato && _username != null)
+            {
+                ConnectedAsLabel.Text = $"Connesso come: {_username}";
+            }
+            else
+            {
+                ConnectedAsLabel.Text = "Non loggato";
             }
         }
 

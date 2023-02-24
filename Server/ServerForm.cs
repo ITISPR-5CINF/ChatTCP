@@ -53,7 +53,7 @@ namespace ChatTCP.Server
 				}
 			}
 
-			this.Text = $"ChatTCP Server - {ipV4}";
+			Text = $"ChatTCP Server - {ipV4}";
         }
 
         private void ServerForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -88,7 +88,7 @@ namespace ChatTCP.Server
                 _stato = Stato.Listening;
                 UpdateLayout();
 
-                Log("Server avviato");
+                Log("StartListening: Server avviato");
 
                 // Creazione funzione di callback per accettare connessioni
                 _listener.BeginAcceptTcpClient(new AsyncCallback(OnAccept), null);
@@ -106,14 +106,14 @@ namespace ChatTCP.Server
         {
             StopListener();
 
-            Log("Server fermato");
+            Log("StopListening: Server fermato");
         }
 
         private void DisconnectEveryoneButton_Click(object sender, EventArgs e)
         {
             DisconnectAllClients();
 
-            Log("Disconnessi tutti i client");
+            Log("DisconnectEveryone: Disconnessi tutti i client");
         }
 
         /// <summary>
@@ -124,6 +124,16 @@ namespace ChatTCP.Server
         {
             if (client != null)
             {
+                var ipAddress = GetTCPClientIPAddress(client);
+                if (ipAddress != null)
+                {
+                    Log($"DisconnectClient: Disconnessione: {ipAddress}");
+                }
+                else
+                {
+                    Log("DisconnectClient: Impossibile ottenere l'indirizzo IP del client");
+                }
+
                 // Rimuovi l'oggetto dalla lista prima di distruggerlo
                 _clientToUsername.Remove(client);
                 _clients.Remove(client);
@@ -201,12 +211,7 @@ namespace ChatTCP.Server
         /// </summary>
         private void OnOnlineUsersUpdated()
         {
-            HashSet<string> onlineUsers = new HashSet<string>();
-
-            foreach (var clients in _clientToUsername)
-            {
-                onlineUsers.Add(clients.Value);
-            }
+            var onlineUsers = _clientToUsername.Values.ToHashSet();
 
             var updatedOnlineUsersMessage = new Protocol.UpdatedOnlineUsersMessage
             {
@@ -214,9 +219,50 @@ namespace ChatTCP.Server
             };
             byte[] messageBytes = Protocol.EncodeMessage(updatedOnlineUsersMessage.ToJson());
 
-            foreach (var clients in _clientToUsername.Keys)
+            foreach (var client in _clientToUsername.Keys)
             {
-                clients.GetStream().Write(messageBytes, 0, messageBytes.Length);
+                if (client == null)
+                {
+                    continue;
+                }
+
+                if (!client.Connected)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var stream = client.GetStream();
+                    stream.Write(messageBytes, 0, messageBytes.Length);
+                }
+                catch (Exception ex) when (ex is SocketException || ex is IOException)
+                {
+                    Log($"OnOnlineUsersUpdated: Errore: {ex.Message}");
+                    continue;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Ottieni un oggetto IPAddress che indica l'indirizzo IP del client connesso
+        /// </summary>
+        /// <param name="client">il client</param>
+        /// <returns>IPAddress se è stato possibile ottenerlo, null altrimenti</returns>
+        private IPAddress GetTCPClientIPAddress(TcpClient client)
+        {
+            if (client == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return ((IPEndPoint)client.Client.RemoteEndPoint).Address;
+            }
+            catch
+            {
+                return null;
             }
         }
 
@@ -239,6 +285,16 @@ namespace ChatTCP.Server
             {
                 var client = _listener.EndAcceptTcpClient(asyn);
 
+                var ipAddress = GetTCPClientIPAddress(client);
+                if (ipAddress != null)
+                {
+                    Log($"OnAccept: Connessione: {ipAddress}");
+                }
+                else
+                {
+                    Log("OnAccept: Impossibile ottenere l'indirizzo IP del client");
+                }
+
                 _clients.Add(client);
 
                 var stream = client.GetStream();
@@ -249,7 +305,7 @@ namespace ChatTCP.Server
                 }
                 catch (Exception ex) when (ex is SocketException || ex is IOException)
                 {
-                    Log($"BeginRead(): Errore: {ex.Message}");
+                    Log($"BeginRead: Errore: {ex.Message}");
                     DisconnectClient(client);
                 }
 
@@ -258,7 +314,7 @@ namespace ChatTCP.Server
             }
             catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"OnAccept(): Errore: {ex.Message}");
+                Log($"OnAccept: Errore: {ex.Message}");
             }
         }
 
@@ -286,6 +342,12 @@ namespace ChatTCP.Server
             }
 
             var stream = client.GetStream();
+
+            var ipAddress = GetTCPClientIPAddress(client);
+            if (ipAddress == null)
+            {
+                Log("OnDataReceived: Impossibile ottenere l'indirizzo IP del client");
+            }
 
             try
             {
@@ -318,6 +380,11 @@ namespace ChatTCP.Server
                         {
                             _clientToUsername[client] = loginMessage.username;
 
+                            if (ipAddress != null)
+                            {
+                                Log($"OnDataReceived: Login di {ipAddress} come {loginMessage.username}");
+                            }
+
                             // Aggiorna gli altri client del nuovo utente connesso
                             OnOnlineUsersUpdated();
                         }
@@ -335,6 +402,11 @@ namespace ChatTCP.Server
                         if (loginResultMessage.result == Protocol.LoginResultMessage.Result.Success)
                         {
                             _clientToUsername[client] = registerMessage.username;
+
+                            if (ipAddress != null)
+                            {
+                                Log($"OnDataReceived: Login di {ipAddress} come {registerMessage.username}");
+                            }
 
                             // Aggiorna gli altri client del nuovo utente connesso
                             OnOnlineUsersUpdated();
@@ -364,32 +436,45 @@ namespace ChatTCP.Server
                             HashSet<TcpClient> targetClients = new HashSet<TcpClient>();
                             if (sendMessageMessage.to_users != null && sendMessageMessage.to_users.Count > 0)
                             {
+                                // Invia il messaggio agli utenti menzionati e l'utente stesso (in caso di più client loggati con lo stesso account)
                                 targetClients = (from kvp in _clientToUsername
-                                                 where sendMessageMessage.to_users.Contains(kvp.Value)
+                                                 where kvp.Key != client && (sendMessageMessage.to_users.Contains(kvp.Value) || kvp.Value == username)
                                                  select kvp.Key).ToHashSet();
                             }
                             else
                             {
-                                targetClients = _clientToUsername.Keys.ToHashSet();
+                                // Invia il messaggio a tutti tranne che al mittente
+                                targetClients = (from kvp in _clientToUsername.Keys
+                                                 where kvp != client
+                                                 select kvp).ToHashSet();
                             }
 
                             foreach (var targetClient in targetClients)
                             {
+                                if (targetClient == null)
+                                {
+                                    continue;
+                                }
+
                                 if (!targetClient.Connected)
                                 {
-                                    Log("Client non connesso");
                                     DisconnectClient(targetClient);
                                     continue;
                                 }
 
-                                if (targetClient != client)
+                                var streamClient = targetClient.GetStream();
+
+                                try
                                 {
-                                    NetworkStream streamClient = targetClient.GetStream();
                                     streamClient.Write(bytes, 0, bytes.Length);
                                 }
+                                catch (Exception ex) when (ex is SocketException || ex is IOException)
+                                {
+                                    Log($"OnDataReceived: Errore: {ex.Message}");
+                                    DisconnectClient(targetClient);
+                                    continue;
+                                }
                             }
-
-                            AddMessageToUI(Protocol.UNIXTimestampToDateTimeOffset(messageReceivedMessage.timestamp), messageReceivedMessage.username, messageReceivedMessage.message);
                         }
                     }
                     else if (message is Protocol.UpdateUserInfoMessage updateUserInfoMessage)
@@ -403,7 +488,7 @@ namespace ChatTCP.Server
                         }
                         else
                         {
-                            Log("Un utente non loggato ha provato ad aggiornare i dati dell'account");
+                            Log("OnDataReceived: Un utente non loggato ha provato ad aggiornare i dati dell'account");
                         }
                     }
                     else if (message is Protocol.ChangePasswordMessage changePasswordMessage)
@@ -417,7 +502,7 @@ namespace ChatTCP.Server
                         }
                         else
                         {
-                            Log("Un utente non loggato ha provato a cambiare la password");
+                            Log("OnDataReceived: Un utente non loggato ha provato a cambiare la password");
                         }
                     }
                     else if (message is Protocol.LogoutMessage logoutMessage)
@@ -427,17 +512,22 @@ namespace ChatTCP.Server
                         {
                             _clientToUsername.Remove(client);
 
+                            if (ipAddress != null)
+                            {
+                                Log($"OnDataReceived: Logout di {ipAddress}");
+                            }
+
                             // Aggiorna gli altri client dell'utente disconnesso
                             OnOnlineUsersUpdated();
                         }
                         else
                         {
-                            Log("Un utente non loggato ha provato a sloggarsi");
+                            Log("OnDataReceived: Un utente non loggato ha provato a sloggarsi");
                         }
                     }
                     else
                     {
-                        Log("Messaggio sconosciuto ricevuto dal client");
+                        Log("OnDataReceived: Messaggio sconosciuto ricevuto dal client");
                         Log(messageText);
                     }
                 }
@@ -447,7 +537,7 @@ namespace ChatTCP.Server
             }
             catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"OnDataReceived(): SocketException: {ex.Message}");
+                Log($"OnDataReceived: Errore: {ex.Message}");
                 DisconnectClient(client);
             }
         }
@@ -471,11 +561,6 @@ namespace ChatTCP.Server
                     DisconnectEveryoneButton.Enabled = true;
                     break;
             }
-        }
-
-        private void AddMessageToUI(DateTimeOffset date, string username, string message)
-        {
-            Log($"{date:HH:mm:ss} {username}: {message}");
         }
 
         private int intLogCount = 0;

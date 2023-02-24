@@ -118,6 +118,7 @@
             // 
             this.LogListBox.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LogListBox.FormattingEnabled = true;
+            this.LogListBox.HorizontalScrollbar = true;
             this.LogListBox.ItemHeight = 14;
             this.LogListBox.Location = new System.Drawing.Point(191, 12);
             this.LogListBox.Name = "LogListBox";
