@@ -54,6 +54,9 @@ namespace ChatTCP.Client
             NetworkComputersComboBox.SelectedIndex = 0;
             NetworkComputersComboBox.Text = (string)NetworkComputersComboBox.Items[NetworkComputersComboBox.SelectedIndex];
 
+            // Aggiungo la callback per gestire il tasto enter nella TextBox
+            SendTextBox.KeyUp += SendTextBox_KeyUp;
+
             // Imposta lo stato iniziale
             _stato = Stato.Disconnesso;
             AggiornaLayout();
@@ -169,58 +172,18 @@ namespace ChatTCP.Client
             }
         }
 
+        private void SendTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                SendMessage();
+                e.Handled = true;
+            }
+        }
+
         private void SendButton_Click(object sender, EventArgs e)
         {
-            string messageText = SendTextBox.Text;
-
-            // Non inviare un messaggio se vuoto
-            if (string.IsNullOrEmpty(messageText))
-            {
-                return;
-            }
-
-            if (_clientSocket == null)
-            {
-                Log("Send: Client nullo");
-                MessageBox.Show("Non connesso a nessun server");
-                CloseConnection();
-                return;
-            }
-
-            if (!_clientSocket.Connected)
-            {
-                Log("Send: Client non connesso");
-                MessageBox.Show("Non connesso a nessun server");
-                CloseConnection();
-                return;
-            }
-
-            // Serializza il messaggio
-            var toUsers = OnlineUsersCheckedListBox.CheckedItems.Cast<string>().ToHashSet().ToList();
-            Protocol.SendMessageMessage sendMessageMessage = new Protocol.SendMessageMessage
-            {
-                message = messageText,
-                to_users = toUsers
-            };
-            var messageBytes = Protocol.EncodeMessage(sendMessageMessage.ToJson());
-
-            try
-            {
-                _stream.Write(messageBytes, 0, messageBytes.Length);
-            }
-            catch (Exception ex) when (ex is SocketException || ex is IOException)
-            {
-                Log($"Send: Errore: {ex.Message}");
-                MessageBox.Show(ex.Message);
-                CloseConnection();
-                return;
-            }
-
-            // Aggiungi il messaggio nella UI
-            AddMessageToUI(Protocol.DateTimeOffsetNow, _username, sendMessageMessage.message, toUsers);
-
-            // Ripulisi la textbox
-            SendTextBox.Text = "";
+            SendMessage();
         }
 
         private delegate void del_OnConnect(IAsyncResult asyn);
@@ -488,6 +451,63 @@ namespace ChatTCP.Client
             // Aggiorna lo stato e la UI
             _stato = Stato.Disconnesso;
             AggiornaLayout();
+        }
+
+        /// <summary>
+        /// Invia il messaggio scritto nella TextBox
+        /// </summary>
+        private void SendMessage()
+        {
+            string messageText = SendTextBox.Text;
+
+            // Non inviare un messaggio se vuoto
+            if (string.IsNullOrEmpty(messageText))
+            {
+                return;
+            }
+
+            if (_clientSocket == null)
+            {
+                Log("Send: Client nullo");
+                MessageBox.Show("Non connesso a nessun server");
+                CloseConnection();
+                return;
+            }
+
+            if (!_clientSocket.Connected)
+            {
+                Log("Send: Client non connesso");
+                MessageBox.Show("Non connesso a nessun server");
+                CloseConnection();
+                return;
+            }
+
+            // Serializza il messaggio
+            var toUsers = OnlineUsersCheckedListBox.CheckedItems.Cast<string>().ToHashSet().ToList();
+            Protocol.SendMessageMessage sendMessageMessage = new Protocol.SendMessageMessage
+            {
+                message = messageText,
+                to_users = toUsers
+            };
+            var messageBytes = Protocol.EncodeMessage(sendMessageMessage.ToJson());
+
+            try
+            {
+                _stream.Write(messageBytes, 0, messageBytes.Length);
+            }
+            catch (Exception ex) when (ex is SocketException || ex is IOException)
+            {
+                Log($"Send: Errore: {ex.Message}");
+                MessageBox.Show(ex.Message);
+                CloseConnection();
+                return;
+            }
+
+            // Aggiungi il messaggio nella UI
+            AddMessageToUI(Protocol.DateTimeOffsetNow, _username, sendMessageMessage.message, toUsers);
+
+            // Ripulisi la textbox
+            SendTextBox.Text = "";
         }
 
         private void UpdateUsername()
