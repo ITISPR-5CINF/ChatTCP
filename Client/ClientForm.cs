@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -112,9 +113,9 @@ namespace ChatTCP.Client
                 // Inizia la connessione con il server
                 _clientSocket.BeginConnect(ipAddress, port, new AsyncCallback(OnConnect), null);
             }
-            catch (SocketException se)
+            catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                MessageBox.Show($"Errore: {se.Message}");
+                MessageBox.Show($"Errore: {ex.Message}");
                 CloseConnection();
             }
         }
@@ -145,10 +146,10 @@ namespace ChatTCP.Client
             {
                 _stream.Write(bytes, 0, bytes.Length);
             }
-            catch (SocketException se)
+            catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"Logout: Errore: {se.Message}");
-                MessageBox.Show(se.Message);
+                Log($"Logout: Errore: {ex.Message}");
+                MessageBox.Show(ex.Message);
                 CloseConnection();
                 return;
             }
@@ -207,10 +208,10 @@ namespace ChatTCP.Client
             {
                 _stream.Write(messageBytes, 0, messageBytes.Length);
             }
-            catch (SocketException se)
+            catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"Send: Errore: {se.Message}");
-                MessageBox.Show(se.Message);
+                Log($"Send: Errore: {ex.Message}");
+                MessageBox.Show(ex.Message);
                 CloseConnection();
                 return;
             }
@@ -268,10 +269,10 @@ namespace ChatTCP.Client
                 // Torna a ricevere nuovi dati
                 _stream?.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _stream);
             }
-            catch (SocketException se)
+            catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"OnConnect: Errore: {se.Message}");
-                MessageBox.Show(se.Message);
+                Log($"OnConnect: Errore: {ex.Message}");
+                MessageBox.Show(ex.Message);
                 CloseConnection();
             }
         }
@@ -380,10 +381,10 @@ namespace ChatTCP.Client
                 // Torna ad ascoltare nuovi messaggi
                 _stream?.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), _stream);
             }
-            catch (SocketException se)
+            catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"OnDataReceived(): Errore: {se.Message}");
-                MessageBox.Show(se.Message);
+                Log($"OnDataReceived(): Errore: {ex.Message}");
+                MessageBox.Show(ex.Message);
                 CloseConnection();
                 return;
             }
@@ -423,10 +424,10 @@ namespace ChatTCP.Client
                 {
                     _stream.Write(messageBytes, 0, messageBytes.Length);
                 }
-                catch (SocketException se)
+                catch (Exception ex) when (ex is SocketException || ex is IOException)
                 {
-                    Log($"OpenLoginForm(): Errore: {se.Message}");
-                    MessageBox.Show(se.Message);
+                    Log($"OpenLoginForm(): Errore: {ex.Message}");
+                    MessageBox.Show(ex.Message);
                     CloseConnection();
                     return false;
                 }
@@ -456,10 +457,10 @@ namespace ChatTCP.Client
                 {
                     _stream.Write(messageBytes, 0, messageBytes.Length);
                 }
-                catch (SocketException se)
+                catch (Exception ex) when (ex is SocketException || ex is IOException)
                 {
-                    Log($"OpenLoginForm(): Errore: {se.Message}");
-                    MessageBox.Show(se.Message);
+                    Log($"OpenLoginForm(): Errore: {ex.Message}");
+                    MessageBox.Show(ex.Message);
                     CloseConnection();
                     return false;
                 }
@@ -515,10 +516,10 @@ namespace ChatTCP.Client
             {
                 _stream.Write(messageBytes, 0, messageBytes.Length);
             }
-            catch (SocketException se)
+            catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"OnUpdateUserInfo(): Errore: {se.Message}");
-                MessageBox.Show(se.Message);
+                Log($"OnUpdateUserInfo(): Errore: {ex.Message}");
+                MessageBox.Show(ex.Message);
                 CloseConnection();
                 return;
             }
@@ -536,10 +537,10 @@ namespace ChatTCP.Client
             {
                 _stream.Write(messageBytes, 0, messageBytes.Length);
             }
-            catch (SocketException se)
+            catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"OnChangePassword(): Errore: {se.Message}");
-                MessageBox.Show(se.Message);
+                Log($"OnChangePassword(): Errore: {ex.Message}");
+                MessageBox.Show(ex.Message);
                 CloseConnection();
                 return;
             }

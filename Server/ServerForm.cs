@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -79,10 +80,10 @@ namespace ChatTCP.Server
                 // Creazione funzione di callback per accettare connessioni
                 _listener.BeginAcceptTcpClient(new AsyncCallback(OnAccept), null);
             }
-            catch (SocketException se)
+            catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"StartListening: Errore: {se.Message}");
-                MessageBox.Show(se.Message);
+                Log($"StartListening: Errore: {ex.Message}");
+                MessageBox.Show(ex.Message);
                 StopListener();
                 return;
             }
@@ -169,9 +170,10 @@ namespace ChatTCP.Server
             try
             {
                 _listener?.Stop();
-            } catch (SocketException se)
+            }
+            catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"StopListener: Errore: {se.Message}");
+                Log($"StopListener: Errore: {ex.Message}");
             }
             _listener = null;
 
@@ -232,18 +234,18 @@ namespace ChatTCP.Server
                 {
                     stream.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), client);
                 }
-                catch (SocketException se)
+                catch (Exception ex) when (ex is SocketException || ex is IOException)
                 {
-                    Log($"BeginRead(): Errore: {se.Message}");
+                    Log($"BeginRead(): Errore: {ex.Message}");
                     DisconnectClient(client);
                 }
 
                 // Torna ad ascoltare nuove richieste di connessione
                 _listener.BeginAcceptTcpClient(new AsyncCallback(OnAccept), null);
             }
-            catch (SocketException se)
+            catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"OnAccept(): Errore: {se.Message}");
+                Log($"OnAccept(): Errore: {ex.Message}");
             }
         }
 
@@ -430,9 +432,9 @@ namespace ChatTCP.Server
                 // Torna ad ascoltare nuovi messaggi
                 stream?.BeginRead(receivedBytesBuffer, 0, receivedBytesBuffer.Length, new AsyncCallback(OnDataReceived), client);
             }
-            catch (SocketException se)
+            catch (Exception ex) when (ex is SocketException || ex is IOException)
             {
-                Log($"OnDataReceived(): SocketException: {se.Message}");
+                Log($"OnDataReceived(): SocketException: {ex.Message}");
                 DisconnectClient(client);
             }
         }
