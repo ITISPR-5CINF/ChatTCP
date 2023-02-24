@@ -349,12 +349,9 @@ namespace ChatTCP.Server
                             HashSet<TcpClient> targetClients = new HashSet<TcpClient>();
                             if (sendMessageMessage.to_users != null && sendMessageMessage.to_users.Count > 0)
                             {
-                                foreach (string user in sendMessageMessage.to_users)
-                                {
-                                    targetClients = (from kvp in _clientToUsername
-                                                     where kvp.Value == user
-                                                     select kvp.Key).ToHashSet();
-                                }
+                                targetClients = (from kvp in _clientToUsername
+                                                 where sendMessageMessage.to_users.Contains(kvp.Value)
+                                                 select kvp.Key).ToHashSet();
                             }
                             else
                             {
