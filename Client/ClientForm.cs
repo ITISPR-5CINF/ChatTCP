@@ -741,6 +741,12 @@ namespace ChatTCP.Client
             OnlineUsersCheckedListBox.Items.Clear();
             foreach (string user in users)
             {
+                // Non aggiungere l'utente con cui siamo loggati
+                if (user == _username)
+                {
+                    continue;
+                }
+
                 OnlineUsersCheckedListBox.Items.Add(user);
             }
         }
