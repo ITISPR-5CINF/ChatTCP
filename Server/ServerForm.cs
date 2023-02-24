@@ -41,6 +41,19 @@ namespace ChatTCP.Server
             // Imposta lo stato iniziale
             _stato = Stato.Iniziale;
             UpdateLayout();
+
+            string ipV4 = "";
+
+			var host = Dns.GetHostEntry(Dns.GetHostName());
+			foreach (var ip in host.AddressList)
+			{
+				if (ip.AddressFamily == AddressFamily.InterNetwork)
+				{
+                    ipV4 = ip.ToString();
+				}
+			}
+
+			this.Text = $"ChatTCP Server - {ipV4}";
         }
 
         private void ServerForm_FormClosing(object sender, FormClosingEventArgs e)
