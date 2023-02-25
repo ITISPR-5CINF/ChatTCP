@@ -437,17 +437,15 @@ namespace ChatTCP.Server
                             HashSet<TcpClient> targetClients = new HashSet<TcpClient>();
                             if (sendMessageMessage.to_users != null && sendMessageMessage.to_users.Count > 0)
                             {
-                                // Invia il messaggio agli utenti menzionati e l'utente stesso (in caso di più client loggati con lo stesso account)
+                                // Invia il messaggio agli utenti menzionati e al mittente
                                 targetClients = (from kvp in _clientToUsername
-                                                 where kvp.Key != client && (sendMessageMessage.to_users.Contains(kvp.Value) || kvp.Value == username)
+                                                 where sendMessageMessage.to_users.Contains(kvp.Value) || kvp.Value == username
                                                  select kvp.Key).ToHashSet();
                             }
                             else
                             {
-                                // Invia il messaggio a tutti tranne che al mittente
-                                targetClients = (from kvp in _clientToUsername.Keys
-                                                 where kvp != client
-                                                 select kvp).ToHashSet();
+                                // Invia il messaggio a tutti
+                                targetClients = _clientToUsername.Keys.ToHashSet();
                             }
 
                             foreach (var targetClient in targetClients)

@@ -502,9 +502,6 @@ namespace ChatTCP.Client
                 return;
             }
 
-            // Aggiungi il messaggio nella UI
-            AddMessageToUI(Protocol.DateTimeOffsetNow, _username, sendMessageMessage.message, toUsers);
-
             // Ripulisi la textbox
             SendTextBox.Text = "";
         }
